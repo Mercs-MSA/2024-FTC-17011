@@ -71,7 +71,7 @@ public final class MecanumDrive {
 
         // drive model parameters
         //public double inPerTick = .0225621587; //encoders
-        public double inPerTick = .0029547973; //odometry.0029484033
+        public double inPerTick = 0.00294859941; //odometry.0029547973
         //public double lateralInPerTick = .0180167315; //encoders
         public double lateralInPerTick = 0.0022641423; //odometry0.002379769649248765
         //public double trackWidthTicks = 1344.9631790761148; //encoders
@@ -79,9 +79,9 @@ public final class MecanumDrive {
 
         // feedforward parameters (in tick units)
         //public double kS = 1.4238910978211923; //encoders
-        public double kS = 0.806129252910559; //odometry
+        public double kS = 0.8428070780812624; //odometry.0.806129252910559
         //public double kV = 0.004216248140197725; //encoders
-        public double kV = 0.0005744177981287746; //odometry
+        public double kV = 0.0005780044899820716; //odometry.0.0005744177981287746
         //public double kA = 0.000001; //encoders
         public double kA = 0.0001; //odometry
 
@@ -264,7 +264,7 @@ public final class MecanumDrive {
         //configureOtos();
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick);//DriveLocalizer();
+        localizer = new TwoDeadWheelLocalizer(hardwareMap, lazyImu.get(), PARAMS.inPerTick);//DriveLocalizer();
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
