@@ -53,6 +53,6 @@ public class AutonTest extends LinearOpMode {
         waitForStart();
 
 //        Actions.runBlocking(trajectoryAction1);
-        Actions.runBlocking(climber.climberUp());
+        Actions.runBlocking(lift.pivotDown());
     }
 }
