@@ -11,10 +11,13 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Lift {
     private DcMotor liftMotor = null;
-
+    private Servo claw;
+    private Servo score;
+    private Servo axis;
     private DcMotor pivot = null;
     public Lift(HardwareMap hardwareMap) {
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
@@ -22,6 +25,12 @@ public class Lift {
 
         pivot = hardwareMap.get(DcMotor.class, "pivot");
         pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        claw = hardwareMap.get(Servo.class, "claw");
+
+        score = hardwareMap.get(Servo.class, "score");
+
+        axis = hardwareMap.get(Servo.class, "axis");
     }
 
 
