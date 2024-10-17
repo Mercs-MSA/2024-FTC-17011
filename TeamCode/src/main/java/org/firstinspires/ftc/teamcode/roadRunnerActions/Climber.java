@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.roadRunnerActions;
 
+import static org.firstinspires.ftc.teamcode.Constants.climberTickPerIn;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -19,6 +20,8 @@ public class Climber {
         climberR = hardwareMap.get(DcMotorEx.class, "climberR");
         climberR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         climberR.setDirection(DcMotor.Direction.FORWARD);
+        climberR.setTargetPosition(0);
+        climberR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         climberR.setPower(0.5);
 
         climberL = hardwareMap.get(DcMotorEx.class, "climberL");
@@ -38,7 +41,7 @@ public class Climber {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                climberR.setTargetPosition(20);
+                climberR.setTargetPosition((int)(5 * climberTickPerIn));
                 climberL.setTargetPosition(20);
                 hookL.setPosition(0.3);
                 hookR.setPosition(0.6);
@@ -48,8 +51,7 @@ public class Climber {
         }
     }
 
-    public Action ClimberUp() {
+    public Action climberUp() {
         return new ClimberUp();
     }
 }
-// within the Lift class

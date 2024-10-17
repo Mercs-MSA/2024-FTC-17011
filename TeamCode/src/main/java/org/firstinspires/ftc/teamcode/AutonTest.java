@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.roadRunnerActions.Climber;
 import org.firstinspires.ftc.teamcode.roadRunnerActions.Lift;
 
 
@@ -32,6 +33,7 @@ public class AutonTest extends LinearOpMode {
         //We are following this: https://rr.brott.dev/docs/v1-0/guides/centerstage-auto/ while working on this. Setting starting pose
         MecanumDrive drive = new MecanumDrive(hardwareMap, StartPose);
         Lift lift = new Lift(hardwareMap);
+        Climber climber = new Climber(hardwareMap);
 
         drive.leftFront.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         drive.leftBack.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -51,6 +53,6 @@ public class AutonTest extends LinearOpMode {
         waitForStart();
 
 //        Actions.runBlocking(trajectoryAction1);
-        Actions.runBlocking(trajectoryAction1);
+        Actions.runBlocking(climber.climberUp());
     }
 }
