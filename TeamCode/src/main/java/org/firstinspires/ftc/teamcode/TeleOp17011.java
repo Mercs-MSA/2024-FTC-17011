@@ -29,17 +29,24 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.Constants.climberTickPerIn;
+import static org.firstinspires.ftc.teamcode.Constants.pivotTickPerDegree;
+import static org.firstinspires.ftc.teamcode.Constants.slideTickPerIn;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.acmerobotics.dashboard.FtcDashboard;
+
+import org.firstinspires.ftc.teamcode.roadRunnerActions.Intake;
+
+import java.sql.RowId;
 
 
 /*
@@ -70,10 +77,10 @@ import com.acmerobotics.dashboard.FtcDashboard;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Omni Linear OpMode", group="Linear OpMode")
+@TeleOp(name="TeleOp17011", group="Linear OpMode")
 @Config
 
-public class BasicOmniOpMode_Linear extends LinearOpMode {
+public class TeleOp17011 extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -81,11 +88,103 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-
+    private Servo Intake_Claw;
+    private Servo Intake_Spin;
+    private Servo Intake_Pivot;
+    private DcMotor Linear_Slide;
+    private DcMotor Slide_Pivot;
+    private DcMotor Right_Climber;
+    private DcMotor Left_Climber;
+    private Servo Right_Hook;
+    private Servo Left_Hook;
     public static double NEW_P = 10;
     public static double NEW_I = 3;
     public static double NEW_D = 0;
+
     FtcDashboard dash;
+
+    public void Slide_Extend_High_Basket() {
+        if (gamepad2.x) {
+            Linear_Slide.setPower(0.7);
+            Linear_Slide.setTargetPosition((int)(31 * slideTickPerIn));
+        }
+    }
+    public void Slide_Extend_Spec_High() {
+        if (gamepad2.a) {
+            Linear_Slide.setPower(0.7);
+            Linear_Slide.setTargetPosition((int)(20 * slideTickPerIn));
+        }
+    }
+    public void Slide_Pivot_Start() {
+        if (gamepad2.b) {
+            Slide_Pivot.setPower(0.7);
+            Slide_Pivot.setTargetPosition(0);
+        }
+    }
+    public void Slide_Pivot_Expand() {
+        if (gamepad2.y) {
+            Slide_Pivot.setPower(0.7);
+            Slide_Pivot.setTargetPosition((int)(30 * pivotTickPerDegree));
+        }
+    }
+    public void Climbers_Up() {
+        if  (gamepad2.right_trigger > .01) {
+            Right_Climber.setPower(0.7);
+            Right_Climber.setTargetPosition((int)(5*climberTickPerIn));
+            Left_Climber.setPower(0.7);
+            Left_Climber.setTargetPosition((int)(5*climberTickPerIn));
+        }
+    }
+    public void Climbers_Down() {
+        if  (gamepad2.left_trigger > .01) {
+            Right_Climber.setPower(0.7);
+            Right_Climber.setTargetPosition(0);
+            Left_Climber.setPower(0.7);
+            Left_Climber.setTargetPosition(0);
+        }
+    }
+    public void Hooks_Up() {
+        if(gamepad2.dpad_up) {
+            Left_Hook.setPosition(1);
+            Right_Hook.setPosition(1);
+        }
+    }
+    public void Hooks_Down() {
+        if(gamepad2.dpad_down) {
+            Left_Hook.setPosition(1);
+            Right_Hook.setPosition(1);
+        }
+    }
+    public void Claw_Close() {
+        if (gamepad1.y) {
+            Intake_Claw.setPosition((int)(0));
+        }
+    }
+    public void Claw_Open() {
+        if (gamepad1.b) {
+            Intake_Claw.setPosition((int)(1));
+        }
+    }
+    public void Spin_Start() {
+        if (gamepad1.x) {
+            Intake_Spin.setPosition((int)(0));
+        }
+    }
+    public void Spin_Full() {
+        if (gamepad1.a)
+            Intake_Spin.setPosition((int)(1));
+    }
+    public void Intake_Pivot_Start() {
+        if (gamepad1.right_trigger > 0.01) {
+            Intake_Pivot.setPosition(0);
+        }
+    }
+    public void Intake_Pivot_Expand() {
+        if(gamepad1.left_trigger > 0.01) {
+            Intake_Pivot.setPosition(1);
+        }
+    }
+
 
     @Override
     public void runOpMode() {
@@ -98,34 +197,34 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRight");
         rightBackDrive = hardwareMap.get(DcMotor.class, "backRight");
 
-//        // get the PID coefficients for the RUN_USING_ENCODER  modes.
-//        PIDFCoefficients pidOrig = rightBackDrive.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//        PIDFCoefficients pidOrig2 = rightBackDrive.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-//        // change coefficients using methods included with DcMotorEx class.
-//        PIDFCoefficients pidNew = new PIDFCoefficients(NEW_P,NEW_I,NEW_D,pidOrig.f);
-//
-//        rightBackDrive.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidNew);
-        // re-read coefficients and verify change.
-//        PIDCoefficients pidModified = rightBackDrive.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
-        // ########################################################################################
-        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
-        // ########################################################################################
-        // Most robots need the motors on one side to be reversed to drive forward.
-        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
-        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
-        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
-        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
-        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        // Wait for the game to start (driver presses PLAY)
+        Linear_Slide = hardwareMap.get(DcMotor.class, "Linear_Slide");
+        Linear_Slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Linear_Slide.setDirection(DcMotor.Direction.FORWARD);
+
+        Slide_Pivot = hardwareMap.get(DcMotor.class, "Slide_Pivot");
+        Slide_Pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        Right_Climber = hardwareMap.get(DcMotorEx.class, "Right_Climber");
+        Right_Climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        Left_Climber = hardwareMap.get(DcMotorEx.class, "Left_Climber");
+        Left_Climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        Left_Hook = hardwareMap.get(Servo.class, "Left_Hook");
+        Right_Hook = hardwareMap.get(Servo.class, "Right_Hook");
+
+        Intake_Claw = hardwareMap.get(Servo.class, "Intake_Claw");
+
+        Intake_Spin = hardwareMap.get(Servo.class, "Intake_Spin");
+
+        Intake_Pivot = hardwareMap.get(Servo.class, "Intake_Pivot");
+
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -155,6 +254,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
+
 
 //            if (max > 1.0) {
 //                leftFrontPower  /= max;
@@ -209,4 +309,5 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 //            telemetry.addData("Old pidOrig:", pidOrig2);
             telemetry.update();
         }
-    }}
+    }
+}
