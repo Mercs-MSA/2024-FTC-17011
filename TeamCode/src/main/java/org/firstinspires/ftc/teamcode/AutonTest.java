@@ -32,8 +32,8 @@ public class AutonTest extends LinearOpMode {
         Pose2d StartPose = new Pose2d(StartPoseX, StartPoseY, Math.toRadians(StartPoseT));
         //We are following this: https://rr.brott.dev/docs/v1-0/guides/centerstage-auto/ while working on this. Setting starting pose
         MecanumDrive drive = new MecanumDrive(hardwareMap, StartPose);
-        Lift lift = new Lift(hardwareMap);
-        Climber climber = new Climber(hardwareMap);
+//        Lift lift = new Lift(hardwareMap);
+//        Climber climber = new Climber(hardwareMap);
 
         drive.leftFront.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         drive.leftBack.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -45,14 +45,14 @@ public class AutonTest extends LinearOpMode {
         Action trajectoryAction2;
 
         trajectoryAction1 = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(0, -32))
-                .strafeTo(new Vector2d(-49, -32))
-                .turn(Math.toRadians(180))
-                .splineTo(new Vector2d(-53, -53), Math.toRadians(215))
+                .strafeTo(new Vector2d(0, -24))
+                .strafeTo(new Vector2d(-24, -24))
+//                .turn(Math.toRadians(180))
+                .splineTo(new Vector2d(0, 0), Math.toRadians(215))
                 .build();
         waitForStart();
 
-//        Actions.runBlocking(trajectoryAction1);
-        Actions.runBlocking(lift.pivotDown());
+        Actions.runBlocking(trajectoryAction1);
+//        Actions.runBlocking(lift.pivotDown());
     }
 }

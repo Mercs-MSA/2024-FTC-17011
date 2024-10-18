@@ -202,27 +202,27 @@ public class TeleOp17011 extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        Linear_Slide = hardwareMap.get(DcMotor.class, "Linear_Slide");
+        Linear_Slide = hardwareMap.get(DcMotor.class, "lift");
         Linear_Slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Linear_Slide.setDirection(DcMotor.Direction.FORWARD);
 
-        Slide_Pivot = hardwareMap.get(DcMotor.class, "Slide_Pivot");
+        Slide_Pivot = hardwareMap.get(DcMotor.class, "pivot");
         Slide_Pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        Right_Climber = hardwareMap.get(DcMotorEx.class, "Right_Climber");
-        Right_Climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        Right_Climber = hardwareMap.get(DcMotorEx.class, "climberR");
+//        Right_Climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//        Left_Climber = hardwareMap.get(DcMotorEx.class, "climberL");
+//        Left_Climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//        Left_Hook = hardwareMap.get(Servo.class, "hookL");
+//        Right_Hook = hardwareMap.get(Servo.class, "hookR");
 
-        Left_Climber = hardwareMap.get(DcMotorEx.class, "Left_Climber");
-        Left_Climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Intake_Claw = hardwareMap.get(Servo.class, "claw");
 
-        Left_Hook = hardwareMap.get(Servo.class, "Left_Hook");
-        Right_Hook = hardwareMap.get(Servo.class, "Right_Hook");
+        Intake_Spin = hardwareMap.get(Servo.class, "spinX");
 
-        Intake_Claw = hardwareMap.get(Servo.class, "Intake_Claw");
-
-        Intake_Spin = hardwareMap.get(Servo.class, "Intake_Spin");
-
-        Intake_Pivot = hardwareMap.get(Servo.class, "Intake_Pivot");
+        Intake_Pivot = hardwareMap.get(Servo.class, "pivotY");
 
 
         telemetry.addData("Status", "Initialized");
@@ -255,6 +255,16 @@ public class TeleOp17011 extends LinearOpMode {
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
 
+            Slide_Extend_High_Basket();
+            Slide_Extend_Spec_High();
+            Slide_Pivot_Expand();
+            Slide_Pivot_Start();
+            Intake_Pivot_Expand();
+            Intake_Pivot_Start();
+            Claw_Close();
+            Claw_Open();
+            Spin_Full();
+            Spin_Start();
 
 //            if (max > 1.0) {
 //                leftFrontPower  /= max;
