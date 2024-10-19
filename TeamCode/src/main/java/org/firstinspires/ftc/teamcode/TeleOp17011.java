@@ -130,6 +130,13 @@ public class TeleOp17011 extends LinearOpMode {
             specimenIntake.setPosition(1);
         }
     }
+    public void Double_Slide_Move() {
+        if (gamepad1.right_bumper) {
+            leftSlide.setPower(0.1);
+            rightSlide.setPower(0.1);
+        }
+    }
+
 
 
     @Override
@@ -149,10 +156,16 @@ public class TeleOp17011 extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         leftSlide = hardwareMap.get(DcMotor.class, "lift");
-        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftSlide.setTargetPosition(0);
-        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        leftSlide.setTargetPosition(0);
+//        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftSlide.setDirection(DcMotor.Direction.FORWARD);
+
+        rightSlide = hardwareMap.get(DcMotor.class, "lift");
+//        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rightSlide.setTargetPosition(0);
+//        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlide.setDirection(DcMotor.Direction.FORWARD);
 
         pivot = hardwareMap.get(DcMotor.class, "pivot");
         pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -160,14 +173,6 @@ public class TeleOp17011 extends LinearOpMode {
         pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         pivot.setDirection(DcMotorSimple.Direction.REVERSE);
 
-//        Right_Climber = hardwareMap.get(DcMotorEx.class, "climberR");
-//        Right_Climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//        Left_Climber = hardwareMap.get(DcMotorEx.class, "climberL");
-//        Left_Climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//        Left_Hook = hardwareMap.get(Servo.class, "hookL");
-//        Right_Hook = hardwareMap.get(Servo.class, "hookR");
 
         claw = hardwareMap.get(Servo.class, "claw");
 

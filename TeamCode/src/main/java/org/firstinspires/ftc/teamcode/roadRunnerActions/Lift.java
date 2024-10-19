@@ -82,7 +82,7 @@ public class Lift {
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 pivot.setPower(.7);
-                pivot.setTargetPosition(340);
+                pivot.setTargetPosition(0);
                 initialized = true;
             }
             return true;
@@ -102,7 +102,7 @@ public class Lift {
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 pivot.setPower(.7);
-                pivot.setTargetPosition(0);
+                pivot.setTargetPosition((int)(30 * pivotTickPerDegree));
                 initialized = true;
             }
             return true;
