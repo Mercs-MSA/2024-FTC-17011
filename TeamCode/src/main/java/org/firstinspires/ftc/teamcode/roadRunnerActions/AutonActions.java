@@ -166,6 +166,9 @@ public class AutonActions {
             return true;
         }
     }
+    public Action ClawPivot180() {
+        return new ClawPivot180();
+    }
     public class ClawPivot0 implements Action {
         private boolean intialized = false;
 
@@ -176,6 +179,9 @@ public class AutonActions {
             }
             return true;
         }
+    }
+    public Action ClawPivot0() {
+        return new ClawPivot0();
     }
     public class ClawSpin90 implements Action {
         private boolean intialized = false;
@@ -188,6 +194,9 @@ public class AutonActions {
             return true;
         }
     }
+    public Action ClawSpin90() {
+        return new ClawSpin90();
+    }
     public class ClawSpin0 implements Action {
         private boolean intialized = false;
 
@@ -198,6 +207,9 @@ public class AutonActions {
             }
             return true;
         }
+    }
+    public Action ClawSpin0() {
+        return new ClawSpin0();
     }
     public class SpecimenClose implements Action {
         private boolean initalized = false;
@@ -210,6 +222,9 @@ public class AutonActions {
             return true;
         }
     }
+    public Action SpecimenClose() {
+        return new SpecimenClose();
+    }
     public class SpecimenOpen implements Action {
         private boolean initalized = false;
 
@@ -220,5 +235,8 @@ public class AutonActions {
             }
             return true;
         }
+    }
+    public Action SpecimenOpen() {
+        return new SpecimenOpen();
     }
 }
