@@ -71,26 +71,6 @@ public class TeleOp17011 extends LinearOpMode {
     FtcDashboard dash;
 
     public void configureScoringMechanism() {
-        leftSlide = hardwareMap.get(DcMotorEx.class, "leftSlide");
-        PIDFCoefficients slidePIDFOrig = leftSlide.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-//        PIDFCoefficients slidePIDFNew = new PIDFCoefficients(0,0,0,0);
-        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftSlide.setTargetPosition(0);
-        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftSlide.setDirection(DcMotor.Direction.FORWARD);
-
-        rightSlide = hardwareMap.get(DcMotorEx.class, "rightSlide");
-        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlide.setTargetPosition(0);
-        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightSlide.setDirection(DcMotor.Direction.FORWARD);
-
-        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
-        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        pivot.setTargetPosition(0);
-        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        pivot.setDirection(DcMotorSimple.Direction.REVERSE);
-
         //Lift Up
         if (gamepad2.x) {
 //            slidePIDFNew = new PIDFCoefficients(0.00111, slidePIDFOrig.i, slidePIDFOrig.d, slidePIDFOrig.f);
@@ -111,15 +91,15 @@ public class TeleOp17011 extends LinearOpMode {
         }
 
         //Pivot Up
-        if (gamepad2.b) {
+        if (gamepad2.y) {
             pivot.setPower(0.7);
             pivot.setTargetPosition(0);
         }
 
         //Pivot Down
-        if (gamepad2.y) {
+        if (gamepad2.b) {
             pivot.setPower(0.7);
-            pivot.setTargetPosition((int) (30 * pivotTickPerDegree));
+            pivot.setTargetPosition((int) (90 * pivotTickPerDegree));
         }
     }
 
@@ -168,6 +148,25 @@ public class TeleOp17011 extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
+        leftSlide = hardwareMap.get(DcMotorEx.class, "leftSlide");
+        PIDFCoefficients slidePIDFOrig = leftSlide.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+//        PIDFCoefficients slidePIDFNew = new PIDFCoefficients(0,0,0,0);
+        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftSlide.setTargetPosition(0);
+        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftSlide.setDirection(DcMotor.Direction.FORWARD);
+
+        rightSlide = hardwareMap.get(DcMotorEx.class, "rightSlide");
+        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightSlide.setTargetPosition(0);
+        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlide.setDirection(DcMotor.Direction.REVERSE);
+
+        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
+        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        pivot.setTargetPosition(0);
+        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        pivot.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intake = hardwareMap.get(Servo.class, "intake");
 
