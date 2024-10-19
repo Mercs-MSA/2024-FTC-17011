@@ -29,28 +29,18 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.Constants.climberTickPerIn;
 import static org.firstinspires.ftc.teamcode.Constants.pivotTickPerDegree;
 import static org.firstinspires.ftc.teamcode.Constants.slideTickPerIn;
 
-import android.transition.Slide;
-
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Line;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.acmerobotics.dashboard.FtcDashboard;
-
-import org.firstinspires.ftc.teamcode.roadRunnerActions.Intake;
-
-import java.sql.RowId;
-
 
 
 @TeleOp(name="TeleOp17011", group="Linear OpMode")
@@ -128,12 +118,6 @@ public class TeleOp17011 extends LinearOpMode {
         
         if (gamepad1.left_trigger > 0.01) {
             specimenIntake.setPosition(1);
-        }
-    }
-    public void Double_Slide_Move() {
-        if (gamepad1.right_bumper) {
-            leftSlide.setPower(0.1);
-            rightSlide.setPower(0.1);
         }
     }
 

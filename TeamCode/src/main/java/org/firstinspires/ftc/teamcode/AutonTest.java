@@ -2,16 +2,14 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.roadRunnerActions.Climber;
-import org.firstinspires.ftc.teamcode.roadRunnerActions.Lift;
+
+import org.firstinspires.ftc.teamcode.roadRunnerActions.AutonActions;
 
 
 //This autonomous is for testing Road Runner
@@ -32,8 +30,8 @@ public class AutonTest extends LinearOpMode {
         Pose2d StartPose = new Pose2d(StartPoseX, StartPoseY, Math.toRadians(StartPoseT));
         //We are following this: https://rr.brott.dev/docs/v1-0/guides/centerstage-auto/ while working on this. Setting starting pose
         MecanumDrive drive = new MecanumDrive(hardwareMap, StartPose);
-        Lift lift = new Lift(hardwareMap);
-        Climber climber = new Climber(hardwareMap);
+        AutonActions lift = new AutonActions(hardwareMap);
+
 
         drive.leftFront.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         drive.leftBack.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
