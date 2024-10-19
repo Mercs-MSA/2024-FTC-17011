@@ -37,7 +37,9 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -54,12 +56,12 @@ public class TeleOp17011 extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-    private Servo claw;
-    private Servo clawPivot;
+    private Servo intake;
+    private Servo intakePivot;
     private Servo specimenIntake;
-    private DcMotor leftSlide;
-    private DcMotor rightSlide;
-    private DcMotor pivot;
+    private DcMotorEx leftSlide;
+    private DcMotorEx rightSlide;
+    private DcMotorEx pivot;
     private Servo Right_Hook;
     private Servo Left_Hook;
     public static double NEW_P = 10;
@@ -68,48 +70,75 @@ public class TeleOp17011 extends LinearOpMode {
 
     FtcDashboard dash;
 
-    public void slideCode() {
+    public void configureScoringMechanism() {
+        leftSlide = hardwareMap.get(DcMotorEx.class, "leftSlide");
+        PIDFCoefficients slidePIDFOrig = leftSlide.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+//        PIDFCoefficients slidePIDFNew = new PIDFCoefficients(0,0,0,0);
+        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftSlide.setTargetPosition(0);
+        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftSlide.setDirection(DcMotor.Direction.FORWARD);
+
+        rightSlide = hardwareMap.get(DcMotorEx.class, "rightSlide");
+        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightSlide.setTargetPosition(0);
+        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlide.setDirection(DcMotor.Direction.FORWARD);
+
+        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
+        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        pivot.setTargetPosition(0);
+        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        pivot.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        //Lift Up
         if (gamepad2.x) {
-            leftSlide.setPower(0.7);
+//            slidePIDFNew = new PIDFCoefficients(0.00111, slidePIDFOrig.i, slidePIDFOrig.d, slidePIDFOrig.f);
+//            leftSlide.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, slidePIDFNew);
+//            rightSlide.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, slidePIDFNew);
+            leftSlide.setPower(.7);
+            rightSlide.setPower(.7);
             leftSlide.setTargetPosition((int) (31 * slideTickPerIn));
+            rightSlide.setTargetPosition((int) (31 * slideTickPerIn));
         }
 
+        //Lift Down
         if (gamepad2.a) {
-            leftSlide.setPower(0.7);
-            leftSlide.setTargetPosition((int) (20 * slideTickPerIn));
+            leftSlide.setPower(.7);
+            rightSlide.setPower(.7);
+            leftSlide.setTargetPosition(0);
+            rightSlide.setTargetPosition(0);
         }
 
+        //Pivot Up
         if (gamepad2.b) {
             pivot.setPower(0.7);
             pivot.setTargetPosition(0);
         }
 
+        //Pivot Down
         if (gamepad2.y) {
             pivot.setPower(0.7);
             pivot.setTargetPosition((int) (30 * pivotTickPerDegree));
         }
-
-        if (gamepad2.dpad_up) {
-            Left_Hook.setPosition(1);
-            Right_Hook.setPosition(1);
-        }
     }
+
         
     public void intakeCode() {
         if (gamepad1.y) {
-            claw.setPosition((int) (0));
+            intake.setPosition((int) (0));
         }
 
         if (gamepad1.b) {
-            claw.setPosition((int) (1));
+            intake.setPosition((int) (1));
         }
 
         if (gamepad1.x) {
-            clawPivot.setPosition((int) (0));
+            intakePivot.setPosition((int) (0));
         }
 
         if (gamepad1.a) {
-            clawPivot.setPosition((int) (1));
+            intakePivot.setPosition((int) (1));
         }
         
         if (gamepad1.right_trigger > 0.01) {
@@ -139,30 +168,12 @@ public class TeleOp17011 extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        leftSlide = hardwareMap.get(DcMotor.class, "lift");
-//        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        leftSlide.setTargetPosition(0);
-//        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftSlide.setDirection(DcMotor.Direction.FORWARD);
 
-        rightSlide = hardwareMap.get(DcMotor.class, "lift");
-//        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        rightSlide.setTargetPosition(0);
-//        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightSlide.setDirection(DcMotor.Direction.FORWARD);
+        intake = hardwareMap.get(Servo.class, "intake");
 
-        pivot = hardwareMap.get(DcMotor.class, "pivot");
-        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        pivot.setTargetPosition(0);
-        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        pivot.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakePivot = hardwareMap.get(Servo.class, "intakePivot");
 
-
-        claw = hardwareMap.get(Servo.class, "claw");
-
-        clawPivot = hardwareMap.get(Servo.class, "spinX");
-
-        specimenIntake = hardwareMap.get(Servo.class, "pivotY");
+        specimenIntake = hardwareMap.get(Servo.class, "specimenIntake");
 
 
         telemetry.addData("Status", "Initialized");
@@ -195,7 +206,7 @@ public class TeleOp17011 extends LinearOpMode {
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
 
-            slideCode();
+            configureScoringMechanism();
             intakeCode();
 
             // Send calculated power to wheels
