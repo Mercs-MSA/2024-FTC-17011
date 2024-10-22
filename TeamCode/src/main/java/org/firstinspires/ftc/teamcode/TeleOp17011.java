@@ -29,6 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.Constants.intakePivotGrabPos;
+import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
+import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
+import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
+import static org.firstinspires.ftc.teamcode.Constants.pivotDownDegrees;
 import static org.firstinspires.ftc.teamcode.Constants.pivotTickPerDegree;
 import static org.firstinspires.ftc.teamcode.Constants.slideTickPerIn;
 
@@ -57,6 +62,7 @@ public class TeleOp17011 extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private Servo intake;
+    private Servo intakeSpin;
     private Servo intakePivot;
     private Servo specimenIntake;
     private DcMotorEx leftSlide;
@@ -68,6 +74,9 @@ public class TeleOp17011 extends LinearOpMode {
     public static double NEW_I = 3;
     public static double NEW_D = 0;
     public static double intakePos = 1;
+    public static double intakeSpinPos = 1;
+    public static double intakePivotPos = 1;
+    public static double specimenPos = 1;
 
     public boolean pivotBool = false;
 
@@ -123,8 +132,34 @@ public class TeleOp17011 extends LinearOpMode {
         //Pivot Down
         if (gamepad2.y) {
             pivot.setPower(0.7);
-            pivot.setTargetPosition((int) (90 * pivotTickPerDegree));
+            pivot.setTargetPosition((int) (400));
             pivotBool = true;
+        }
+
+        //Score High Basket
+        if (gamepad2.dpad_up) {
+            leftSlide.setPower(.7);
+            rightSlide.setPower(.7);
+            leftSlide.setTargetPosition((int) (31 * slideTickPerIn));
+            rightSlide.setTargetPosition((int) (31 * slideTickPerIn));
+            intakePivot.setPosition(intakePivotScorePos);
+            if (intakePivot.getPosition() == intakePivotScorePos) {
+                intake.setPosition(intakeScorePos);
+                if (intake.getPosition() == intakeScorePos) {
+                    intakePivot.setPosition(intakePivotGrabPos);
+                }
+            }
+            //Default Pos
+        } else if (gamepad2.dpad_down)  {
+            leftSlide.setPower(.7);
+            rightSlide.setPower(.7);
+            leftSlide.setTargetPosition(0);
+            rightSlide.setTargetPosition(0);
+            pivot.setTargetPosition((int) (90 * pivotTickPerDegree));
+            intake.setPosition(intakeScorePos);
+            intakePivot.setPosition(intakePivotGrabPos);
+            intakeSpin.setPosition(intakeSpinDefault);
+
         }
     }
 
@@ -135,23 +170,15 @@ public class TeleOp17011 extends LinearOpMode {
         }
 
         if (gamepad1.b) {
-            intake.setPosition(intakePos);
+            intakeSpin.setPosition(intakeSpinPos);
         }
 
         if (gamepad1.x) {
-            intakePivot.setPosition((int) (0));
+            intakePivot.setPosition(intakePivotPos);
         }
 
         if (gamepad1.a) {
-            intakePivot.setPosition((int) (1));
-        }
-        
-        if (gamepad1.right_trigger > 0.01) {
-            specimenIntake.setPosition(0);
-        }
-        
-        if (gamepad1.left_trigger > 0.01) {
-            specimenIntake.setPosition(1);
+            specimenIntake.setPosition(specimenPos);
         }
     }
 
@@ -160,7 +187,7 @@ public class TeleOp17011 extends LinearOpMode {
     @Override
     public void runOpMode() {
         MecanumDrive drive1 = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
-
+        FtcDashboard dash = FtcDashboard.getInstance();
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -175,6 +202,8 @@ public class TeleOp17011 extends LinearOpMode {
 
 
         intake = hardwareMap.get(Servo.class, "intake");
+
+        intakeSpin = hardwareMap.get(Servo.class, "intakeSpin");
 
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
 
@@ -224,11 +253,6 @@ public class TeleOp17011 extends LinearOpMode {
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
-           // rightBackDrive.setVelocity(rightBackPower*2500);
-            // Show the elapsed game time and wheel power.
-//            telemetry.addData("Status", "Run Time: " + runtime.toString());
-//            telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-//            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             drive1.updatePoseEstimate();
 //            telemetry.addData("X: ", drive1.poseOTOS.position.x);
 //            telemetry.addData("Y: ", drive1.poseOTOS.position.y);
