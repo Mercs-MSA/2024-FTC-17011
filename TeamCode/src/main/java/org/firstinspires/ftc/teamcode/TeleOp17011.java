@@ -70,9 +70,10 @@ public class TeleOp17011 extends LinearOpMode {
     private DcMotorEx pivot;
     private Servo Right_Hook;
     private Servo Left_Hook;
-    public static double NEW_P = 10;
-    public static double NEW_I = 3;
-    public static double NEW_D = 0;
+    public static double NEW_P = 14;
+    public static double NEW_I = .8;
+    public static double NEW_D = 0.2;
+    public static double NEW_F = 0.2;
     public static double intakePos = 1;
     public static double intakeSpinPos = 1;
     public static double intakePivotPos = 1;
@@ -97,12 +98,9 @@ public class TeleOp17011 extends LinearOpMode {
         rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightSlide.setDirection(DcMotor.Direction.FORWARD);
 
-        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
-        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        pivot.setTargetPosition(0);
-        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        pivot.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
 
+    public void scoringCode() {
         //Lift Up
         if (gamepad2.x) {
 //            slidePIDFNew = new PIDFCoefficients(0.00111, slidePIDFOrig.i, slidePIDFOrig.d, slidePIDFOrig.f);
@@ -125,14 +123,15 @@ public class TeleOp17011 extends LinearOpMode {
         //Pivot Up
         if (gamepad2.b) {
             pivotBool = false;
-            pivot.setPower(0.7);
+//            pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             pivot.setTargetPosition(0);
         }
 
         //Pivot Down
         if (gamepad2.y) {
-            pivot.setPower(0.7);
-            pivot.setTargetPosition((int) (400));
+//            pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            pivot.setPower(.7);
+            pivot.setTargetPosition(154);
             pivotBool = true;
         }
 
@@ -150,7 +149,7 @@ public class TeleOp17011 extends LinearOpMode {
                 }
             }
             //Default Pos
-        } else if (gamepad2.dpad_down)  {
+        } else if (gamepad2.dpad_down) {
             leftSlide.setPower(.7);
             rightSlide.setPower(.7);
             leftSlide.setTargetPosition(0);
@@ -163,7 +162,7 @@ public class TeleOp17011 extends LinearOpMode {
         }
     }
 
-        
+
     public void intakeCode() {
         if (gamepad1.y) {
             intake.setPosition(intakePos);
@@ -181,6 +180,7 @@ public class TeleOp17011 extends LinearOpMode {
             specimenIntake.setPosition(specimenPos);
         }
     }
+
 
 
 
@@ -208,6 +208,20 @@ public class TeleOp17011 extends LinearOpMode {
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
 
         specimenIntake = hardwareMap.get(Servo.class, "specimenIntake");
+
+        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
+        pivot.setDirection(DcMotorSimple.Direction.REVERSE);
+        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pivot.setTargetPositionTolerance(3);
+        PIDFCoefficients pivotPIDFNew = new PIDFCoefficients(NEW_P,NEW_I,NEW_D,NEW_F);
+        pivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
+        pivot.setTargetPosition(0);
+        pivot.setPower(0.75);
+        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        configureScoringMechanism();
 
 
         telemetry.addData("Status", "Initialized");
@@ -240,11 +254,15 @@ public class TeleOp17011 extends LinearOpMode {
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
 
-            configureScoringMechanism();
+            scoringCode();
             intakeCode();
 
-            if (pivot.getCurrentPosition() >= ((int)60 * pivotTickPerDegree) && pivotBool == true) {
-                pivot.setPower(0.05);
+            if (pivot.getCurrentPosition() >= (200) && pivotBool == true) {
+                pivot.setPower(0);
+            } else if (pivotBool == false) {
+                pivot.setPower(1);
+            } else if (pivotBool) {
+                pivot.setPower(.75);
             }
 
 
@@ -260,6 +278,7 @@ public class TeleOp17011 extends LinearOpMode {
             telemetry.addData("X-pod: ", drive1.pose.position.x);
             telemetry.addData("Y-pod: ", drive1.pose.position.y);
             telemetry.addData("Heading: ", drive1.pose.heading);
+            telemetry.addData("Pivot: ", pivot.getCurrentPosition());
 //            telemetry.addData("Current velocity:", rightBackDrive.getVelocity());
 //            telemetry.addData("Current power:", (rightBackDrive.getPower()*2500));
 //            telemetry.addData("PID Values:", pidNew);
