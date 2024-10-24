@@ -33,7 +33,7 @@ import static org.firstinspires.ftc.teamcode.Constants.intakePivotGrabPos;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
-import static org.firstinspires.ftc.teamcode.Constants.pivotDownDegrees;
+import static org.firstinspires.ftc.teamcode.Constants.pivotDownPos;
 import static org.firstinspires.ftc.teamcode.Constants.pivotTickPerDegree;
 import static org.firstinspires.ftc.teamcode.Constants.slideTickPerIn;
 
