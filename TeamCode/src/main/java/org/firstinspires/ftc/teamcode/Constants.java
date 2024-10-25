@@ -13,15 +13,20 @@ public class Constants {
     public final static double intakePivotGrabPos = 0.55;
     public final static double intakeScorePos = 1;
     public final static double intakeHoldPos = 0.4;
-    public final static double intakeSpinDefault = 0;
+    public final static double intakeSpinDefault = 0.5;
     public final static double specimenScorePos = 0.65;
     public final static double specimenHoldPos = 0.35;
 
-    public static double pivotDownPos = 75;
+    public static int pivotUpPos = 390;
+    public static int pivotDownPos = 60;
 
     public final static double highBasketPos = 910;
     public final static double highSpecimenPos = 600;
     public final static double lowBasketInch = 0;
 
     public final static double climbLowInch = 0;
+
+    public static int defaultState = 0;
+    public static int highBasketState = 1;
+    public static int highSpecimenState = 2;
 }

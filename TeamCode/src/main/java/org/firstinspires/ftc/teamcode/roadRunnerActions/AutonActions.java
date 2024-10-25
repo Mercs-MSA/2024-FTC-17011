@@ -8,7 +8,7 @@ import static org.firstinspires.ftc.teamcode.Constants.intakePivotGrabPos;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
-import static org.firstinspires.ftc.teamcode.Constants.pivotDownPos;
+import static org.firstinspires.ftc.teamcode.Constants.pivotUpPos;
 import static org.firstinspires.ftc.teamcode.Constants.pivotTickPerDegree;
 import static org.firstinspires.ftc.teamcode.Constants.slideTickPerIn;
 import static org.firstinspires.ftc.teamcode.Constants.specimenHoldPos;
@@ -305,7 +305,7 @@ public class AutonActions {
                 intakePivot.setPosition(intakePivotGrabPos);
                 intake.setPosition(intakeScorePos);
                 intakeSpin.setPosition(intakeSpinDefault);
-                pivot.setTargetPosition((int)pivotDownPos);
+                pivot.setTargetPosition(pivotUpPos);
                 rightSlide.setTargetPosition(0);
                 leftSlide.setTargetPosition(0);
             }
