@@ -30,17 +30,31 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.Constants.defaultState;
+import static org.firstinspires.ftc.teamcode.Constants.highBasketPos;
+import static org.firstinspires.ftc.teamcode.Constants.highSpecScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.highSpecimenPos;
 import static org.firstinspires.ftc.teamcode.Constants.highSpecimenState;
 import static org.firstinspires.ftc.teamcode.Constants.intakeHoldPos;
+import org.firstinspires.ftc.teamcode.subSystems.Intakes;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotGrabPos;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
+import static org.firstinspires.ftc.teamcode.Constants.intakeSpinLeft;
+import static org.firstinspires.ftc.teamcode.Constants.intakeSpinRight;
+import static org.firstinspires.ftc.teamcode.Constants.lowBasketPos;
+import static org.firstinspires.ftc.teamcode.Constants.normalSpeed;
 import static org.firstinspires.ftc.teamcode.Constants.pivotDownPos;
 import static org.firstinspires.ftc.teamcode.Constants.pivotUpPos;
+
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.subSystems.Pivot;
+import org.firstinspires.ftc.teamcode.subSystems.Slides;
+
 import static org.firstinspires.ftc.teamcode.Constants.pivotTickPerDegree;
-import static org.firstinspires.ftc.teamcode.Constants.slideTickPerIn;
+import static org.firstinspires.ftc.teamcode.Constants.slowSpeed;
 import static org.firstinspires.ftc.teamcode.Constants.specimenHoldPos;
 import static org.firstinspires.ftc.teamcode.Constants.specimenScorePos;
 
@@ -65,31 +79,20 @@ import com.acmerobotics.dashboard.FtcDashboard;
 public class TeleOp17011 extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
+    public IMU imu = null;
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-    private Servo intake;
-    private Servo intakeSpin;
-    private Servo intakePivot;
-    private Servo specimenIntake;
-    private DcMotorEx leftSlide;
-    private DcMotorEx rightSlide;
-    private DcMotorEx pivot;
-    private Servo Right_Hook;
-    private Servo Left_Hook;
+    public Intakes intakes;
+    public Slides slides;
+    public Pivot pivot;
     public static double NEW_P = 18;
     public static double NEW_I = 1;
-    public static double NEW_D = 0.2;
-    public static double NEW_F = 0.2;
-    public static double intakePos = 1;
-    public static double intakeSpinPos = 1;
-    public static double intakePivotPos = 1;
-    public static double specimenPos = 1;
+    public static double NEW_D = 0.4;
+    public static double NEW_F = 1;
 
-    public int leftSlidePower = 0;
-    public int rightSlidePower = 0;
 
     public boolean pivotBool = false;
     public boolean specimenBool = true;
@@ -98,39 +101,94 @@ public class TeleOp17011 extends LinearOpMode {
 
     public boolean intakeControl = true;
     public boolean intPivotControl = true;
+
+    public double speedMultiplier;
     FtcDashboard dash;
 
+    private void initializeImu() {
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
+        // Now initialize the IMU with this mounting orientation
+        // This sample expects the IMU to be in a REV Hub and named "imu".
+        imu = hardwareMap.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+    }
+
+    public void initializeMotors() throws InterruptedException {
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "frontLeft");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "backLeft");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRight");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "backRight");
+
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        intakes = new Intakes(hardwareMap);
+
+        slides = new Slides(hardwareMap);
+
+        pivot = new Pivot(hardwareMap, NEW_P, NEW_I, NEW_D, NEW_F);
+    }
     public void scoringCode() {
         //Lift High Basket
-        if (gamepad2.y) {
-            leftSlide.setTargetPosition((int) (33 * slideTickPerIn));
-            rightSlide.setTargetPosition((int) (33 * slideTickPerIn));
+        if (gamepad2.dpad_up) {
+            if (!pivotBool) {
+                slides.slideSetPos(highBasketPos);
+            } else if (pivotBool) {
+                leftSlide.setTargetPosition(lowBasketPos);
+                rightSlide.setTargetPosition(lowBasketPos);
+            }
+        } else if (gamepad2.dpad_left) {
+            leftSlide.setTargetPosition(60);
+            rightSlide.setTargetPosition(60);
         }
 
         //Lift High Specimen
-        if (gamepad2.dpad_up) {
-            leftSlide.setTargetPosition((int) (20 * slideTickPerIn));
-            rightSlide.setTargetPosition((int) (20 * slideTickPerIn));
+        if (gamepad2.left_bumper) {
+            if (!pivotBool) {
+                intakePivot.setPosition(intakePivotGrabPos);
+                leftSlide.setTargetPosition(highSpecimenPos);
+                rightSlide.setTargetPosition(highSpecimenPos);
+            } else if (pivotBool) {
+                leftSlide.setTargetPosition(lowBasketPos);
+                rightSlide.setTargetPosition(lowBasketPos);
+            }
+        } else if (gamepad2.right_bumper) {
+            if (!pivotBool) {
+                specimenIntake.setPosition(specimenHoldPos);
+                leftSlide.setTargetPosition(highSpecScorePos);
+                rightSlide.setTargetPosition(highSpecScorePos);
+            } else if (pivotBool) {
+                leftSlide.setTargetPosition(lowBasketPos);
+                rightSlide.setTargetPosition(lowBasketPos);
+            }
+        }
+
+        if (gamepad2.dpad_right) {
+            leftSlide.setTargetPosition(lowBasketPos);
+            rightSlide.setTargetPosition(lowBasketPos);
         }
 
         //Lift Down
-        if (gamepad2.a) {
+        if (gamepad2.dpad_down) {
             leftSlide.setTargetPosition(0);
             rightSlide.setTargetPosition(0);
+            pivotBool = true;
+            pivot.setTargetPosition(pivotDownPos);
         }
 
-        //Pivot
-        if (gamepad2.b) {
-            boolean temp = true;
-            if (temp) {
-                pivotBool = false;
-                pivot.setTargetPosition(pivotUpPos);
-            } else if (!temp) {
-                pivotBool = true;
-//            pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                pivot.setTargetPosition(pivotDownPos);
-            }
+        if (gamepad2.x) {
+            pivotBool = false;
+            pivot.setTargetPosition(pivotUpPos);
         }
 
         //Score High Basket
@@ -179,91 +237,102 @@ public class TeleOp17011 extends LinearOpMode {
 
 
     public void intakeCode() {
-        if (gamepad1.b) {
-            if (intakeControl && intake.getPosition() == intakeHoldPos) {
-                intake.setPosition(intakeScorePos);
-                intakeControl = false;
-            } else if (!intakeControl && intake.getPosition() == intakeScorePos) {
-                intake.setPosition(intakeHoldPos);
-                intakeControl = true;
-            }
+        if (gamepad1.right_bumper) {
+            intake.setPosition(intakeScorePos);
+            specimenIntake.setPosition(specimenScorePos);
+        } else if (gamepad1.left_bumper) {
+            intake.setPosition(intakeHoldPos);
+            specimenIntake.setPosition(specimenHoldPos);
         }
 
-        if (gamepad1.x) {
+        if (gamepad2.right_trigger > .3) {
+            intakeSpin.setPosition(intakeSpinRight);
+        } else if (gamepad2.left_trigger > .3) {
+            intakeSpin.setPosition(intakeSpinLeft);
+        } else {
             intakeSpin.setPosition(intakeSpinDefault);
         }
 
-        if (gamepad1.y) {
-            if (intPivotControl && intakePivot.getPosition() == intakePivotScorePos) {
-                intakePivot.setPosition(intakePivotGrabPos);
-                intPivotControl = false;
-            } else if (!intPivotControl && intakePivot.getPosition() == intakePivotGrabPos) {
-                intakePivot.setPosition(intakePivotScorePos);
-                intPivotControl = true;
-            }
+        if (gamepad2.y) {
+            intakePivot.setPosition(intakePivotScorePos);
+        } else if (gamepad2.a) {
+            intakePivot.setPosition(intakePivotGrabPos);
+        } else if (gamepad2.b) {
+            intakePivot.setPosition(.3);
         }
     }
+    private void fieldCentricDrive() {
+        double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+        double x = gamepad1.left_stick_x; // Counteract imperfect strafing
+        double rx = gamepad1.right_stick_x;
 
+        // Calculate the current angle of the robot (yaw) relative to the field.
+        double robotAngle = -Math.toRadians(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)); // Modify this to get the actual robot angle.
+
+        // Calculate the field-centric components of movement.
+        double fieldX = x * Math.cos(robotAngle) - y * Math.sin(robotAngle);
+        double fieldY = x * Math.sin(robotAngle) + y * Math.cos(robotAngle);
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(fieldY) + Math.abs(fieldX) + Math.abs(rx), 1);
+        double frontLeftPower = (fieldY + fieldX + rx) / denominator;
+        double backLeftPower = (fieldY - fieldX + rx) / denominator;
+        double frontRightPower = (fieldY - fieldX - rx) / denominator;
+        double backRightPower = (fieldY + fieldX - rx) / denominator;
+
+        // Set the motor powers.
+        leftFrontDrive.setPower(frontLeftPower);
+        leftBackDrive.setPower(backLeftPower);
+        rightFrontDrive.setPower(frontRightPower);
+        rightBackDrive.setPower(backRightPower);
+    }
+
+    public void mechanumDrive() {
+        double max;
+//            dash = FtcDashboard.getInstance();
+//            telemetry = dash.getTelemetry();
+
+        // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+        double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+        double lateral =  gamepad1.left_stick_x;
+        double yaw     =  gamepad1.right_stick_x;
+
+        // Combine the joystick requests for each axis-motion to determine each wheel's power.
+        // Set up a variable for each drive wheel to save the power level for telemetry.
+        double leftFrontPower  = axial + lateral + yaw;
+        double rightFrontPower = axial - lateral - yaw;
+        double leftBackPower   = axial - lateral + yaw;
+        double rightBackPower  = axial + lateral - yaw;
+
+        // Normalize the values so no wheel power exceeds 100%
+        // This ensures that the robot maintains the desired motion.
+        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        leftFrontDrive.setPower(leftFrontPower * speedMultiplier);
+        rightFrontDrive.setPower(rightFrontPower * speedMultiplier);
+        leftBackDrive.setPower(leftBackPower * speedMultiplier);
+        rightBackDrive.setPower(rightBackPower * speedMultiplier);
+    }
 
 
 
     @Override
     public void runOpMode() {
-        MecanumDrive drive1 = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
         FtcDashboard dash = FtcDashboard.getInstance();
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "frontLeft");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "backLeft");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRight");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "backRight");
 
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        initializeMotors();
 
+        intake.setPosition(intakeScorePos);
 
-        intake = hardwareMap.get(Servo.class, "intake");
+        intakePivot.setPosition(intakePivotScorePos);
 
-        intakeSpin = hardwareMap.get(Servo.class, "intakeSpin");
-
-        intakePivot = hardwareMap.get(Servo.class, "intakePivot");
-
-        specimenIntake = hardwareMap.get(Servo.class, "specimenIntake");
-
-        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
-        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        pivot.setTargetPositionTolerance(3);
-        PIDFCoefficients pivotPIDFNew = new PIDFCoefficients(NEW_P,NEW_I,NEW_D,NEW_F);
-        pivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
-        pivot.setTargetPosition(0);
-        pivot.setPower(1);
-        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftSlide = hardwareMap.get(DcMotorEx.class, "leftSlide");;
-        leftSlide.setDirection(DcMotor.Direction.REVERSE);
-//        PIDFCoefficients slidePIDFOrig = leftSlide.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-//        PIDFCoefficients slidePIDFNew = new PIDFCoefficients(0,0,0,0);
-        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftSlide.setTargetPosition(0);
-        leftSlide.setPower(.7);
-        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        rightSlide = hardwareMap.get(DcMotorEx.class, "rightSlide");
-        rightSlide.setDirection(DcMotor.Direction.REVERSE);
-        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlide.setTargetPosition(0);
-        rightSlide.setPower(.7);
-        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        intake.setPosition(intakeHoldPos);
-
-
+        initializeImu();
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -272,43 +341,21 @@ public class TeleOp17011 extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            double max;
-//            dash = FtcDashboard.getInstance();
-//            telemetry = dash.getTelemetry();
-
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x;
-            double yaw     =  gamepad1.right_stick_x;
-
-            // Combine the joystick requests for each axis-motion to determine each wheel's power.
-            // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower  = axial + lateral + yaw;
-            double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower   = axial - lateral + yaw;
-            double rightBackPower  = axial + lateral - yaw;
-
-            // Normalize the values so no wheel power exceeds 100%
-            // This ensures that the robot maintains the desired motion.
-            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-            max = Math.max(max, Math.abs(leftBackPower));
-            max = Math.max(max, Math.abs(rightBackPower));
-
-            leftSlidePower = (int)(-gamepad2.left_stick_y * 20);
-            rightSlidePower = (int)(-gamepad1.left_stick_y * 20);
 
             scoringCode();
             intakeCode();
+//            fieldCentricDrive();
+            mechanumDrive();
 
             if (pivot.getCurrentPosition() <= (70) && pivotBool == true) {
-                pivot.setPower(-0.05);
+                pivot.setPower(0);
             } else if (pivotBool == false) {
                 pivot.setPower(1);
-                if (pivot.getCurrentPosition() > 390) {
-                    pivot.setTargetPosition(pivotUpPos + 30);
+                if (pivot.getCurrentPosition() > 420) {
+                    pivot.setPower(0);
                 }
             } else if (pivotBool) {
-                pivot.setPower(.6);
+                pivot.setPower(.3);
             }
 
 //            if (slideReadyBool && mechanismState == highBasketState) {
@@ -318,19 +365,16 @@ public class TeleOp17011 extends LinearOpMode {
 //                leftSlide.setTargetPosition(0);
 //                rightSlide.setTargetPosition(0);
 //            }
+            if (gamepad1.right_trigger > .5) {
+                speedMultiplier = slowSpeed;
+            } else {
+                speedMultiplier = normalSpeed;
+            }
+
             // Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-            drive1.updatePoseEstimate();
-//            telemetry.addData("X: ", drive1.poseOTOS.position.x);
-//            telemetry.addData("Y: ", drive1.poseOTOS.position.y);
-//            telemetry.addData("Theta: ", Math.toDegrees(drive1.poseOTOS.heading.toDouble()));
-            telemetry.addData("X-pod: ", drive1.pose.position.x);
-            telemetry.addData("Y-pod: ", drive1.pose.position.y);
-            telemetry.addData("Heading: ", drive1.pose.heading);
             telemetry.addData("Pivot: ", pivot.getCurrentPosition());
+            telemetry.addData("left slide: ", leftSlide.getCurrentPosition());
+            telemetry.addData("right slide: ", rightSlide.getCurrentPosition());
 //            telemetry.addData("Current velocity:", rightBackDrive.getVelocity());
 //            telemetry.addData("Current power:", (rightBackDrive.getPower()*2500));
 //            telemetry.addData("PID Values:", pidNew);
