@@ -24,4 +24,11 @@ public class Pivot {
     public void pivotSetPos(int pos) {
         pivot.setTargetPosition(pos);
     }
+
+    public void setPow(double pow) {
+        pivot.setPower(pow);
+    }
+    public int getPos() {
+        return pivot.getCurrentPosition();
+    }
 }

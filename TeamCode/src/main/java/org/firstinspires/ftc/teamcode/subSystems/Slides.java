@@ -30,4 +30,12 @@ public class Slides {
         leftSlide.setTargetPosition(pos);
         rightSlide.setTargetPosition(pos);
     }
+
+    public int getRightPos() {
+        return rightSlide.getCurrentPosition();
+    }
+
+    public int getLeftPos() {
+        return leftSlide.getCurrentPosition();
+    }
 }

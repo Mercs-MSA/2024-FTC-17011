@@ -144,51 +144,43 @@ public class TeleOp17011 extends LinearOpMode {
             if (!pivotBool) {
                 slides.slideSetPos(highBasketPos);
             } else if (pivotBool) {
-                leftSlide.setTargetPosition(lowBasketPos);
-                rightSlide.setTargetPosition(lowBasketPos);
+                slides.slideSetPos(lowBasketPos);
             }
         } else if (gamepad2.dpad_left) {
-            leftSlide.setTargetPosition(60);
-            rightSlide.setTargetPosition(60);
+            slides.slideSetPos(60); //Specimen Grab
         }
 
         //Lift High Specimen
         if (gamepad2.left_bumper) {
             if (!pivotBool) {
-                intakePivot.setPosition(intakePivotGrabPos);
-                leftSlide.setTargetPosition(highSpecimenPos);
-                rightSlide.setTargetPosition(highSpecimenPos);
+                intakes.pivotSetPos(intakePivotGrabPos);
+                slides.slideSetPos(highSpecimenPos);
             } else if (pivotBool) {
-                leftSlide.setTargetPosition(lowBasketPos);
-                rightSlide.setTargetPosition(lowBasketPos);
+                slides.slideSetPos(lowBasketPos);
             }
         } else if (gamepad2.right_bumper) {
             if (!pivotBool) {
-                specimenIntake.setPosition(specimenHoldPos);
-                leftSlide.setTargetPosition(highSpecScorePos);
-                rightSlide.setTargetPosition(highSpecScorePos);
+                intakes.specSetPos(specimenHoldPos);
+                slides.slideSetPos(highSpecScorePos);
             } else if (pivotBool) {
-                leftSlide.setTargetPosition(lowBasketPos);
-                rightSlide.setTargetPosition(lowBasketPos);
+                slides.slideSetPos(lowBasketPos);
             }
         }
 
         if (gamepad2.dpad_right) {
-            leftSlide.setTargetPosition(lowBasketPos);
-            rightSlide.setTargetPosition(lowBasketPos);
+            slides.slideSetPos(lowBasketPos);
         }
 
         //Lift Down
         if (gamepad2.dpad_down) {
-            leftSlide.setTargetPosition(0);
-            rightSlide.setTargetPosition(0);
+            slides.slideSetPos(0);
             pivotBool = true;
-            pivot.setTargetPosition(pivotDownPos);
+            pivot.pivotSetPos(pivotDownPos);
         }
 
         if (gamepad2.x) {
             pivotBool = false;
-            pivot.setTargetPosition(pivotUpPos);
+            pivot.pivotSetPos(pivotUpPos);
         }
 
         //Score High Basket
@@ -238,27 +230,27 @@ public class TeleOp17011 extends LinearOpMode {
 
     public void intakeCode() {
         if (gamepad1.right_bumper) {
-            intake.setPosition(intakeScorePos);
-            specimenIntake.setPosition(specimenScorePos);
+            intakes.clawSetPos(intakeScorePos);
+            intakes.specSetPos(specimenScorePos);
         } else if (gamepad1.left_bumper) {
-            intake.setPosition(intakeHoldPos);
-            specimenIntake.setPosition(specimenHoldPos);
+            intakes.clawSetPos(intakeHoldPos);
+            intakes.specSetPos(specimenHoldPos);
         }
 
         if (gamepad2.right_trigger > .3) {
-            intakeSpin.setPosition(intakeSpinRight);
+            intakes.spinSetPos(intakeSpinRight);
         } else if (gamepad2.left_trigger > .3) {
-            intakeSpin.setPosition(intakeSpinLeft);
+            intakes.spinSetPos(intakeSpinLeft);
         } else {
-            intakeSpin.setPosition(intakeSpinDefault);
+            intakes.spinSetPos(defaultState);
         }
 
         if (gamepad2.y) {
-            intakePivot.setPosition(intakePivotScorePos);
+            intakes.pivotSetPos(intakePivotScorePos);
         } else if (gamepad2.a) {
-            intakePivot.setPosition(intakePivotGrabPos);
+            intakes.pivotSetPos(intakePivotGrabPos);
         } else if (gamepad2.b) {
-            intakePivot.setPosition(.3);
+            intakes.pivotSetPos(.3);
         }
     }
     private void fieldCentricDrive() {
@@ -321,16 +313,12 @@ public class TeleOp17011 extends LinearOpMode {
 
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         FtcDashboard dash = FtcDashboard.getInstance();
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
 
         initializeMotors();
-
-        intake.setPosition(intakeScorePos);
-
-        intakePivot.setPosition(intakePivotScorePos);
 
         initializeImu();
         telemetry.addData("Status", "Initialized");
@@ -347,15 +335,15 @@ public class TeleOp17011 extends LinearOpMode {
 //            fieldCentricDrive();
             mechanumDrive();
 
-            if (pivot.getCurrentPosition() <= (70) && pivotBool == true) {
-                pivot.setPower(0);
+            if (pivot.getPos() <= (70) && pivotBool == true) {
+                pivot.setPow(0);
             } else if (pivotBool == false) {
-                pivot.setPower(1);
-                if (pivot.getCurrentPosition() > 420) {
-                    pivot.setPower(0);
+                pivot.setPow(1);
+                if (pivot.getPos() > 420) {
+                    pivot.setPow(0);
                 }
             } else if (pivotBool) {
-                pivot.setPower(.3);
+                pivot.setPow(.3);
             }
 
 //            if (slideReadyBool && mechanismState == highBasketState) {
@@ -372,9 +360,9 @@ public class TeleOp17011 extends LinearOpMode {
             }
 
             // Send calculated power to wheels
-            telemetry.addData("Pivot: ", pivot.getCurrentPosition());
-            telemetry.addData("left slide: ", leftSlide.getCurrentPosition());
-            telemetry.addData("right slide: ", rightSlide.getCurrentPosition());
+            telemetry.addData("Pivot: ", pivot.getPos());
+            telemetry.addData("left slide: ", slides.getLeftPos());
+            telemetry.addData("right slide: ", slides.getRightPos());
 //            telemetry.addData("Current velocity:", rightBackDrive.getVelocity());
 //            telemetry.addData("Current power:", (rightBackDrive.getPower()*2500));
 //            telemetry.addData("PID Values:", pidNew);
