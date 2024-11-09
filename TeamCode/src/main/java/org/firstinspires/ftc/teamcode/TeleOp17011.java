@@ -29,11 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.Constants.defaultState;
 import static org.firstinspires.ftc.teamcode.Constants.highBasketPos;
 import static org.firstinspires.ftc.teamcode.Constants.highSpecScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.highSpecimenPos;
-import static org.firstinspires.ftc.teamcode.Constants.highSpecimenState;
 import static org.firstinspires.ftc.teamcode.Constants.intakeHoldPos;
 import org.firstinspires.ftc.teamcode.subSystems.Intakes;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotGrabPos;
@@ -44,7 +42,11 @@ import static org.firstinspires.ftc.teamcode.Constants.intakeSpinLeft;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinRight;
 import static org.firstinspires.ftc.teamcode.Constants.lowBasketPos;
 import static org.firstinspires.ftc.teamcode.Constants.normalSpeed;
+import static org.firstinspires.ftc.teamcode.Constants.pivotD;
 import static org.firstinspires.ftc.teamcode.Constants.pivotDownPos;
+import static org.firstinspires.ftc.teamcode.Constants.pivotF;
+import static org.firstinspires.ftc.teamcode.Constants.pivotI;
+import static org.firstinspires.ftc.teamcode.Constants.pivotP;
 import static org.firstinspires.ftc.teamcode.Constants.pivotUpPos;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -53,12 +55,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subSystems.Pivot;
 import org.firstinspires.ftc.teamcode.subSystems.Slides;
 
-import static org.firstinspires.ftc.teamcode.Constants.pivotTickPerDegree;
 import static org.firstinspires.ftc.teamcode.Constants.slowSpeed;
 import static org.firstinspires.ftc.teamcode.Constants.specimenHoldPos;
 import static org.firstinspires.ftc.teamcode.Constants.specimenScorePos;
 
-import static org.firstinspires.ftc.teamcode.Constants.highBasketState;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -88,16 +88,10 @@ public class TeleOp17011 extends LinearOpMode {
     public Intakes intakes;
     public Slides slides;
     public Pivot pivot;
-    public static double NEW_P = 18;
-    public static double NEW_I = 1;
-    public static double NEW_D = 0.4;
-    public static double NEW_F = 1;
-
 
     public boolean pivotBool = false;
     public boolean specimenBool = true;
     public boolean slideReadyBool = false;
-    public int mechanismState = defaultState;
 
     public boolean intakeControl = true;
     public boolean intPivotControl = true;
@@ -136,9 +130,16 @@ public class TeleOp17011 extends LinearOpMode {
 
         slides = new Slides(hardwareMap);
 
-        pivot = new Pivot(hardwareMap, NEW_P, NEW_I, NEW_D, NEW_F);
+        pivot = new Pivot(hardwareMap, pivotP, pivotI, pivotD, pivotF);
     }
     public void scoringCode() {
+        //GP2 dpad up = high basket slides
+        //GP2 dpad down = everything down
+        //GP2 dpad left = specimen grab prep slides position
+        //GP2 dpad right = low basket/intake slides position
+        //GP2 left bumper = high specimen pos
+        //GP2 right bumper = high specimen score
+        //GP2 x = pivot up
         //Lift High Basket
         if (gamepad2.dpad_up) {
             if (!pivotBool) {
@@ -229,6 +230,13 @@ public class TeleOp17011 extends LinearOpMode {
 
 
     public void intakeCode() {
+        //GP1 right bumper = all open
+        //GP1 left bumper = all close
+        //GP2 right trigger = turn intake right
+        //GP2 left trigger = turn intake left
+        //GP2 y = intake pivot up
+        //GP2 a = intake pivot down
+        //GP2 b = intake pivot mid
         if (gamepad1.right_bumper) {
             intakes.clawSetPos(intakeScorePos);
             intakes.specSetPos(specimenScorePos);
@@ -242,7 +250,7 @@ public class TeleOp17011 extends LinearOpMode {
         } else if (gamepad2.left_trigger > .3) {
             intakes.spinSetPos(intakeSpinLeft);
         } else {
-            intakes.spinSetPos(defaultState);
+            intakes.spinSetPos(intakeSpinDefault);
         }
 
         if (gamepad2.y) {

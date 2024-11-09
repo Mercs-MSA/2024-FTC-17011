@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subSystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
+import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
 
 import com.acmerobotics.roadrunner.Line;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -24,6 +25,8 @@ public class Intakes {
 
         intake.setPosition(intakeScorePos);
 
+        intakeSpin.setPosition(intakeSpinDefault);
+
         intakePivot.setPosition(intakePivotScorePos);
     }
 
@@ -38,6 +41,8 @@ public class Intakes {
     public void pivotSetPos(double pos) {
         intakePivot.setPosition(pos);
     }
+
+    public double clawGetPos() { return intake.getPosition(); }
 
     public void specSetPos(double pos) {
         specimenIntake.setPosition(pos);
