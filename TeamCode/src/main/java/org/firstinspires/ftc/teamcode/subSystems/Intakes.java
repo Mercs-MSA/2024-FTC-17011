@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.subSystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
-import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
+//import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
 
 import com.acmerobotics.roadrunner.Line;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -27,13 +28,15 @@ public class Intakes {
 
         specimenIntake = hardwareMap.get(Servo.class, "specimenIntake");
 
+        intakeLeft.setDirection(CRServo.Direction.REVERSE);
+
         intakeRight.setPower(0);
 
         intakeLeft.setPower(0);
 
         intakeSpin.setPosition(intakeSpinDefault);
 
-        intakePivot.setPosition(intakePivotScorePos);
+//        intakePivot.setPosition(intakePivotScorePos); V1
     }
 
 //    public void clawSetPos(double pos) { V1

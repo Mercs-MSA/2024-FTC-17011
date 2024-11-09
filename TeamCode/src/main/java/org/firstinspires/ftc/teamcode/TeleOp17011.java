@@ -118,10 +118,10 @@ public class TeleOp17011 extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRight");
         rightBackDrive = hardwareMap.get(DcMotor.class, "backRight");
 
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - FORWARD
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - FORWARD
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -185,48 +185,6 @@ public class TeleOp17011 extends LinearOpMode {
             pivotBool = false;
             pivot.pivotSetPos(pivotUpPos);
         }
-
-        //Score High Basket
-//        if (gamepad2.dpad_up) {
-//            mechanismState = highBasketState;
-//            pivotBool = false;
-//            slideReadyBool = false;
-//            pivot.setTargetPosition(pivotUpPos);
-//            if (pivot.getCurrentPosition() > pivotUpPos) {
-//                slideReadyBool = true;
-//            }
-//            intakeSpin.setPosition(intakeSpinDefault);
-//            intakePivot.setPosition(intakePivotScorePos);
-//            if (intakePivot.getPosition() == intakePivotScorePos) {
-//                intake.setPosition(intakeScorePos);
-//            }
-//            //Default Pos
-//        } else if (gamepad2.dpad_down) {
-//            mechanismState = defaultState;
-//            intakeSpin.setPosition(intakeSpinDefault);
-//            pivotBool = true;
-//            pivot.setTargetPosition(pivotDownPos);
-//            intake.setPosition(intakeScorePos);
-//            intakePivot.setPosition(intakePivotGrabPos);
-//        } else if (gamepad2.y) { //High Specimen
-//            if (specimenBool) {
-//                mechanismState = highSpecimenState;
-//                leftSlide.setTargetPosition((int)(20 * slideTickPerIn));
-//                rightSlide.setTargetPosition((int)(20 * slideTickPerIn));
-//                pivotBool = false;
-//                pivot.setTargetPosition(pivotUpPos);
-//                intakeSpin.setPosition(intakeSpinDefault);
-//                specimenIntake.setPosition(specimenHoldPos);
-//                specimenBool = true;
-//            } else if (specimenBool == false) {
-//                leftSlide.setTargetPosition((int)(19 * slideTickPerIn));
-//                rightSlide.setTargetPosition((int)(19 * slideTickPerIn));
-//                specimenIntake.setPosition(specimenScorePos);
-//                specimenBool = false;
-//            }
-//        }
-//        leftSlide.setTargetPosition(leftSlidePower);
-//        rightSlide.setTargetPosition(rightSlidePower);
     }
 
 
@@ -247,6 +205,8 @@ public class TeleOp17011 extends LinearOpMode {
 //            intakes.clawSetPos(intakeHoldPos); V1
             intakes.setIntakePower(intakeCollectPow);
             intakes.specSetPos(specimenHoldPos);
+        } else {
+            intakes.setIntakePower(0);
         }
 
         if (gamepad2.right_trigger > .3) {
@@ -315,6 +275,13 @@ public class TeleOp17011 extends LinearOpMode {
         max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
         max = Math.max(max, Math.abs(leftBackPower));
         max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower  /= max;
+            rightFrontPower /= max;
+            leftBackPower   /= max;
+            rightBackPower  /= max;
+        }
 
         leftFrontDrive.setPower(leftFrontPower * speedMultiplier);
         rightFrontDrive.setPower(rightFrontPower * speedMultiplier);
