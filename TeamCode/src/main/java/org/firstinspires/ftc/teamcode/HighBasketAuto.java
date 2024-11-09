@@ -167,10 +167,11 @@ public class HighBasketAuto extends OpMode {
         slides.slideSetPos(constants.firstSpikeSlidePos);
         if ((Math.abs(slides.getLeftPos() - constants.highSpecScorePos) < 150) && Math.abs(slides.getRightPos() - constants.highSpecScorePos) < 150) {
             intakes.pivotSetPos(constants.intakePivotGrabPos);
-            intakes.clawSetPos(constants.intakeHoldPos);
-            if (intakes.clawGetPos() == constants.intakeHoldPos) {
+            intakes.setIntakePower(constants.intakeCollectPow);
+            if ((Math.abs(slides.getLeftPos() - constants.highSpecScorePos) < 5) && Math.abs(slides.getRightPos() - constants.highSpecScorePos) < 5) {
                 slides.slideSetPos(0);
                 currentState = AUTO_STATE.FIRST_BASKET_READY;
+                intakes.setIntakePower(0);
             }
         }
     }
@@ -183,7 +184,7 @@ public class HighBasketAuto extends OpMode {
             slides.slideSetPos(constants.highBasketPos);
             intakes.pivotSetPos(constants.intakePivotScorePos);
             if ((Math.abs(slides.getLeftPos() - constants.highSpecScorePos) < 10) && Math.abs(slides.getRightPos() - constants.highSpecScorePos) < 10) {
-                intakes.clawSetPos(constants.intakeScorePos);
+                intakes.setIntakePower(constants.intakeScorePow);
                 intakes.pivotSetPos(constants.intakePivotGrabPos);
                 slides.slideSetPos(0);
                 pivot.pivotSetPos(constants.pivotDownPos);

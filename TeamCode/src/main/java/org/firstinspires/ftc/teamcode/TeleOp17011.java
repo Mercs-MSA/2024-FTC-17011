@@ -32,11 +32,13 @@ package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.Constants.highBasketPos;
 import static org.firstinspires.ftc.teamcode.Constants.highSpecScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.highSpecimenPos;
-import static org.firstinspires.ftc.teamcode.Constants.intakeHoldPos;
+import static org.firstinspires.ftc.teamcode.Constants.intakeCollectPow;
+//import static org.firstinspires.ftc.teamcode.Constants.intakeHoldPos;
 import org.firstinspires.ftc.teamcode.subSystems.Intakes;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotGrabPos;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
-import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
+//import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
+import static org.firstinspires.ftc.teamcode.Constants.intakeScorePow;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinLeft;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinRight;
@@ -238,10 +240,12 @@ public class TeleOp17011 extends LinearOpMode {
         //GP2 a = intake pivot down
         //GP2 b = intake pivot mid
         if (gamepad1.right_bumper) {
-            intakes.clawSetPos(intakeScorePos);
+//            intakes.clawSetPos(intakeScorePos); V1
+            intakes.setIntakePower(intakeScorePow);
             intakes.specSetPos(specimenScorePos);
         } else if (gamepad1.left_bumper) {
-            intakes.clawSetPos(intakeHoldPos);
+//            intakes.clawSetPos(intakeHoldPos); V1
+            intakes.setIntakePower(intakeCollectPow);
             intakes.specSetPos(specimenHoldPos);
         }
 
