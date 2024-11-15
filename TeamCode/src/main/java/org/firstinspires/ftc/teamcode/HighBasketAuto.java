@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
@@ -11,10 +15,11 @@ import org.firstinspires.ftc.teamcode.subSystems.Intakes;
 import org.firstinspires.ftc.teamcode.subSystems.Pivot;
 import org.firstinspires.ftc.teamcode.subSystems.Slides;
 
-
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.startingPoseLeft;
-
+@Autonomous
 public class HighBasketAuto extends OpMode {
+    private Telemetry telemetryA;
+
     private Constants constants;
     private Follower follower;
     private double botHeading = startingPoseLeft.getHeading();
@@ -25,6 +30,7 @@ public class HighBasketAuto extends OpMode {
     private enum AUTO_STATE {
         START_STATE,
         PATH_ACTIVE,
+        DO_NOTHING,
         PATH_TO_SPEC_READY,
         PATH_TO_BASKET_READY,
         FIRST_MECHANISMS_READY,
@@ -44,8 +50,8 @@ public class HighBasketAuto extends OpMode {
 
     //------------------------------------------------------------------------------------------------------------------------
     public static final Point startPoint = new Point (startingPoseLeft.getX(), startingPoseLeft.getY(), Point.CARTESIAN);
-    public static final Point specStagingPoint = new Point (0, 0, Point.CARTESIAN); //Before going to drop
-    public static final Point specScorePoint = new Point (0, 0, Point.CARTESIAN); //At submersible to score
+    public static final Point specStagingPoint = new Point (-6.75, -45.05, Point.CARTESIAN); //Before going to drop
+    public static final Point specScorePoint = new Point (-6.75, -38.003218042568896, Point.CARTESIAN); //At submersible to score
 
     public static final Path startToStaging = new Path(new BezierCurve(startPoint, specStagingPoint)); //Go to staging point
     public static final Path stagingToScore = new Path(new BezierCurve(specStagingPoint, specScorePoint)); //Go to submersible
@@ -54,7 +60,7 @@ public class HighBasketAuto extends OpMode {
 
     public static final Path scoreToBasket = new Path(new BezierCurve(specScorePoint, basketPoint)); //Go to the basket
     //------------------------------------------------------------------------------------------------------------------------
-    public static final double startToSpecHeading = Math.toRadians(0);
+    public static final double startToSpecHeading = Math.toRadians(90);
     public static final double specToBasketHeading = Math.toRadians(45);
     public static final double spikeOneHeading = Math.toRadians(0);
     public static final double spikeTwoHeading = Math.toRadians(0);
@@ -68,6 +74,11 @@ public class HighBasketAuto extends OpMode {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        follower.setMaxPower(.3);
+
+        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        telemetryA.update();
     }
 
     public void initializeSubSystems() throws InterruptedException {
@@ -79,7 +90,7 @@ public class HighBasketAuto extends OpMode {
     private void setupPath(Path pathToFollow, double endHeading) {
         double currentHeading = botHeading;
         follower.followPath(pathToFollow);
-        pathToFollow.setLinearHeadingInterpolation(currentHeading, endHeading);
+        pathToFollow.setLinearHeadingInterpolation(currentHeading, endHeading, .7);
         botHeading = endHeading;
     }
 
@@ -114,9 +125,9 @@ public class HighBasketAuto extends OpMode {
     //Pivot Up >> Slides Up
     //Intake Pivot Scoring Pos >> Open >> Grab Pos
     //Repeat Last 6 for Second Yellow
-    //All set to zero
-
+    //All set to zero=]]
     public void processStartState() {
+        intakes.pivotSetPos(constants.intakePivotScorePos);
         intakes.specSetPos(constants.specimenHoldPos);
         setupPath(startToStaging, startToSpecHeading);
         currentState = AUTO_STATE.PATH_ACTIVE;
@@ -132,18 +143,23 @@ public class HighBasketAuto extends OpMode {
     //First Call. Prepare for spec score.
     public void processMechanismsReady1() {
         pivot.pivotSetPos(constants.pivotUpPos);
+        intakes.pivotSetPos(constants.intakePivotGrabPos);
         if ((Math.abs(pivot.getPos() - constants.pivotUpPos) < 5)) {
             slides.slideSetPos(constants.highSpecimenPos);
-            currentState = AUTO_STATE.PATH_TO_SPEC_READY;
+            pivot.setPow(0);
+            if ((Math.abs(slides.getLeftPos() - constants.highSpecimenPos) < 25) && Math.abs(slides.getRightPos() - constants.highSpecimenPos) < 25) {
+                currentState = AUTO_STATE.PATH_TO_SPEC_READY;
+            }
         }
     }
     public void processMechanismsReady2() {
         slides.slideSetPos(constants.highSpecScorePos);
         if ((Math.abs(slides.getLeftPos() - constants.highSpecScorePos) < 10) && Math.abs(slides.getRightPos() - constants.highSpecScorePos) < 10) {
             intakes.specSetPos(constants.specimenScorePos);
+            pivot.setPow(.3);
             pivot.pivotSetPos(constants.pivotDownPos);
             slides.slideSetPos(0);
-            currentState = AUTO_STATE.PATH_TO_BASKET_READY;
+            currentState = AUTO_STATE.DO_NOTHING;
             primerState = AUTO_STATE.THIRD_MECHANISMS_READY;
         }
     }
@@ -193,8 +209,9 @@ public class HighBasketAuto extends OpMode {
         }
     }
     public void processSecondSpike() {
-
     }
+
+    public void processDoNothing() {}
     private void processStateMachine() {
         switch(currentState) {
             case START_STATE: processStartState(); break;
@@ -202,10 +219,11 @@ public class HighBasketAuto extends OpMode {
             case FIRST_MECHANISMS_READY: processMechanismsReady1(); break;
             case PATH_TO_SPEC_READY: processPathReady1(); break;
             case SECOND_MECHANISMS_READY: processMechanismsReady2(); break;
-            case PATH_TO_BASKET_READY: processPathReady2(); break;
-            case FIRST_SPIKE_READY: processFirstSpike(); break;
-            case FIRST_BASKET_READY: processFirstBasket(); break;
-            case SECOND_SPIKE_READY: processSecondSpike(); break;
+//            case PATH_TO_BASKET_READY: processPathReady2(); break;
+//            case FIRST_SPIKE_READY: processFirstSpike(); break;
+//            case FIRST_BASKET_READY: processFirstBasket(); break;
+//            case SECOND_SPIKE_READY: processSecondSpike(); break;
+            case DO_NOTHING: processDoNothing(); break;
         }
     }
 
@@ -214,5 +232,10 @@ public class HighBasketAuto extends OpMode {
         processStateMachine();
 
         follower.update();
+        telemetry.addData("pivot pos: ", pivot.getPos());
+        telemetry.addData("current state: ", currentState);
+        telemetry.addData("left pos: ", Math.abs(slides.getLeftPos() - constants.highSpecimenPos));
+        telemetry.update();
+        follower.telemetryDebug(telemetryA);
     }
 }

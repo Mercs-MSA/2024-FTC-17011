@@ -20,13 +20,13 @@ public class Constants {
     public final static double intakeSpinLeft = .9;
 
     public final static double specimenScorePos = 0.12; //.45
-    public final static double specimenHoldPos = 0.35; //0
+    public final static double specimenHoldPos = 0.30; //0
 
     public static int pivotUpPos = 690; //V1 - 420
     public static int pivotDownPos = 60; //V1 - 60
     public static double pivotP = 18;
     public static double pivotI = 1;
-    public static double pivotD = .4;
+    public static double pivotD = .5;
     public static double pivotF = 1;
 
     public static int highBasketPos = 2100; //V1 - 2270
