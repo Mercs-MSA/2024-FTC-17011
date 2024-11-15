@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.Constants.extendPos;
 import static org.firstinspires.ftc.teamcode.Constants.highBasketPos;
 import static org.firstinspires.ftc.teamcode.Constants.highSpecScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.highSpecimenPos;
@@ -39,6 +40,7 @@ import static org.firstinspires.ftc.teamcode.Constants.intakePivotGrabPos;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
 //import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeScorePow;
+import static org.firstinspires.ftc.teamcode.Constants.intakeSpinBack;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinLeft;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinRight;
@@ -91,11 +93,9 @@ public class TeleOp17011 extends LinearOpMode {
     public Slides slides;
     public Pivot pivot;
 
-    public boolean pivotBool = false;
-    public boolean specimenBool = true;
-    public boolean slideReadyBool = false;
+    public boolean pivotBool = true;
+    public boolean initSlides = true;
 
-    public boolean intakeControl = true;
     public boolean intPivotControl = true;
 
     public double speedMultiplier;
@@ -147,7 +147,7 @@ public class TeleOp17011 extends LinearOpMode {
             if (!pivotBool) {
                 slides.slideSetPos(highBasketPos);
             } else if (pivotBool) {
-                slides.slideSetPos(lowBasketPos);
+                slides.slideSetPos(extendPos);
             }
         } else if (gamepad2.dpad_left) {
             slides.slideSetPos(60); //Specimen Grab
@@ -159,14 +159,14 @@ public class TeleOp17011 extends LinearOpMode {
                 intakes.pivotSetPos(intakePivotGrabPos);
                 slides.slideSetPos(highSpecimenPos);
             } else if (pivotBool) {
-                slides.slideSetPos(lowBasketPos);
+                slides.slideSetPos(extendPos);
             }
         } else if (gamepad2.right_bumper) {
             if (!pivotBool) {
                 intakes.specSetPos(specimenHoldPos);
                 slides.slideSetPos(highSpecScorePos);
             } else if (pivotBool) {
-                slides.slideSetPos(lowBasketPos);
+                slides.slideSetPos(extendPos);
             }
         }
 
@@ -184,6 +184,10 @@ public class TeleOp17011 extends LinearOpMode {
         if (gamepad2.x) {
             pivotBool = false;
             pivot.pivotSetPos(pivotUpPos);
+        }
+
+        if (pivotBool) {
+            slides.slideSetPos(slides.getLeftPos() + ((int) (-gamepad2.left_stick_y * 40)));
         }
     }
 
@@ -213,15 +217,20 @@ public class TeleOp17011 extends LinearOpMode {
             intakes.spinSetPos(intakeSpinRight);
         } else if (gamepad2.left_trigger > .3) {
             intakes.spinSetPos(intakeSpinLeft);
-        } else {
+        } else if (gamepad2.right_trigger > .3 && gamepad2.left_trigger > .3) {
+            intakes.spinSetPos(intakeSpinBack);
+        }else {
             intakes.spinSetPos(intakeSpinDefault);
         }
 
         if (gamepad2.y) {
+            intPivotControl = false;
             intakes.pivotSetPos(intakePivotScorePos);
         } else if (gamepad2.a) {
+            intPivotControl = true;
             intakes.pivotSetPos(intakePivotGrabPos);
         } else if (gamepad2.b) {
+            intPivotControl = false;
             intakes.pivotSetPos(.3);
         }
     }
@@ -314,15 +323,22 @@ public class TeleOp17011 extends LinearOpMode {
 //            fieldCentricDrive();
             mechanumDrive();
 
-            if (pivot.getPos() <= (70) && pivotBool == true) {
+            if (pivot.getPos() <= (40) && pivotBool) {
                 pivot.setPow(0);
-            } else if (pivotBool == false) {
+            } else if (!pivotBool) {
                 pivot.setPow(1);
-                if (pivot.getPos() > 420) {
+                if (pivot.getPos() > 650) {
                     pivot.setPow(0);
                 }
             } else if (pivotBool) {
-                pivot.setPow(.3);
+                pivot.setPow(.4);
+                if (slides.getLeftPos() > extendPos && slides.getRightPos() > extendPos) {
+                    slides.slideSetPos(extendPos);
+                }
+            }
+
+            if (intPivotControl) {
+                intakes.pivotSetPos(intakePivotGrabPos);
             }
 
 //            if (slideReadyBool && mechanismState == highBasketState) {
@@ -342,6 +358,11 @@ public class TeleOp17011 extends LinearOpMode {
             telemetry.addData("Pivot: ", pivot.getPos());
             telemetry.addData("left slide: ", slides.getLeftPos());
             telemetry.addData("right slide: ", slides.getRightPos());
+            if (pivotBool) {
+                telemetry.addLine("Pivot is down/going down");
+            } else {
+                telemetry.addLine("Pivot is up/going up");
+            }
 //            telemetry.addData("Current velocity:", rightBackDrive.getVelocity());
 //            telemetry.addData("Current power:", (rightBackDrive.getPower()*2500));
 //            telemetry.addData("PID Values:", pidNew);
