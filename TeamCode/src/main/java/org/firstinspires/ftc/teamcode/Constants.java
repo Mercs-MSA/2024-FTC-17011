@@ -16,8 +16,9 @@ public class Constants {
     public final static double intakeCollectPow = -1;
 
     public final static double intakeSpinDefault = 0.5;
-    public final static double intakeSpinRight = 0.1;
-    public final static double intakeSpinLeft = .9;
+    public final static double intakeSpinRight = 0.25;
+    public final static double intakeSpinLeft = .75;
+    public final static double intakeSpinBack = 1;
 
     public final static double specimenScorePos = 0.12; //.45
     public final static double specimenHoldPos = 0.35; //0
@@ -29,9 +30,10 @@ public class Constants {
     public static double pivotD = .4;
     public static double pivotF = 1;
 
-    public static int highBasketPos = 2100; //V1 - 2270
+    public static int highBasketPos = 2200; //V1 - 2270
     public static int lowBasketPos = 900; //V1 - 1210
-    public static int highSpecimenPos = 1350; //V1 - 1410
+    public static int extendPos = 1050;
+    public static int highSpecimenPos = 1320; //V1 - 1410
     public static int highSpecScorePos = 960; //V1 - 1050
     public final static double lowBasketInch = 0;
 
