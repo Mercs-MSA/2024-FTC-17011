@@ -149,8 +149,9 @@ public class TeleOp17011 extends LinearOpMode {
             } else if (pivotBool) {
                 slides.slideSetPos(extendPos);
             }
-        } else if (gamepad2.dpad_left) {
-            slides.slideSetPos(60); //Specimen Grab
+        }
+        if (gamepad2.dpad_left && pivotBool) {
+            pivot.resetPos();
         }
 
         //Lift High Specimen
@@ -186,7 +187,7 @@ public class TeleOp17011 extends LinearOpMode {
             pivot.pivotSetPos(pivotUpPos);
         }
 
-        if (pivotBool) {
+        if (pivotBool && Math.abs(gamepad2.left_stick_y) > .3) {
             slides.slideSetPos(slides.getLeftPos() + ((int) (-gamepad2.left_stick_y * 40)));
         }
     }
@@ -213,9 +214,9 @@ public class TeleOp17011 extends LinearOpMode {
             intakes.setIntakePower(0);
         }
 
-        if (gamepad2.right_trigger > .3) {
+        if (gamepad2.right_trigger > .3 && gamepad2.left_trigger < .3) {
             intakes.spinSetPos(intakeSpinRight);
-        } else if (gamepad2.left_trigger > .3) {
+        } else if (gamepad2.left_trigger > .3 && gamepad2.left_trigger < .3) {
             intakes.spinSetPos(intakeSpinLeft);
         } else if (gamepad2.right_trigger > .3 && gamepad2.left_trigger > .3) {
             intakes.spinSetPos(intakeSpinBack);
@@ -323,18 +324,18 @@ public class TeleOp17011 extends LinearOpMode {
 //            fieldCentricDrive();
             mechanumDrive();
 
-            if (pivot.getPos() <= (40) && pivotBool) {
+            if (pivot.getPos() <= (60) && pivotBool) {
                 pivot.setPow(0);
+//                if (slides.getLeftPos() > extendPos && slides.getRightPos() > extendPos) {
+//                    slides.slideSetPos(extendPos);
+//                }
             } else if (!pivotBool) {
                 pivot.setPow(1);
-                if (pivot.getPos() > 650) {
+                if (pivot.getPos() > 690) {
                     pivot.setPow(0);
                 }
-            } else if (pivotBool) {
+            } else if (pivot.getPos() > 60 && pivotBool) {
                 pivot.setPow(.4);
-                if (slides.getLeftPos() > extendPos && slides.getRightPos() > extendPos) {
-                    slides.slideSetPos(extendPos);
-                }
             }
 
             if (intPivotControl) {
@@ -363,6 +364,7 @@ public class TeleOp17011 extends LinearOpMode {
             } else {
                 telemetry.addLine("Pivot is up/going up");
             }
+            telemetry.addData("Pivot power: ", pivot.getPow());
 //            telemetry.addData("Current velocity:", rightBackDrive.getVelocity());
 //            telemetry.addData("Current power:", (rightBackDrive.getPower()*2500));
 //            telemetry.addData("PID Values:", pidNew);

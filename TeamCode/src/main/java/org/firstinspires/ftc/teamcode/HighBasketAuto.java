@@ -127,7 +127,6 @@ public class HighBasketAuto extends OpMode {
     //Repeat Last 6 for Second Yellow
     //All set to zero=]]
     public void processStartState() {
-        intakes.pivotSetPos(constants.intakePivotScorePos);
         intakes.specSetPos(constants.specimenHoldPos);
         setupPath(startToStaging, startToSpecHeading);
         currentState = AUTO_STATE.PATH_ACTIVE;
@@ -139,15 +138,27 @@ public class HighBasketAuto extends OpMode {
             currentState = primerState;
         }
     }
+    int i = 0;
 
     //First Call. Prepare for spec score.
     public void processMechanismsReady1() {
-        pivot.pivotSetPos(constants.pivotUpPos);
-        intakes.pivotSetPos(constants.intakePivotGrabPos);
+        if (i < 1) {
+            intakes.pivotSetPos(constants.intakePivotScorePos);
+            pivot.pivotSetPos(-60);
+            pivot.resetPos();
+            i++;
+        }
+        if (i > 0) {
+            pivot.pivotSetPos(constants.pivotUpPos);
+        }
         if ((Math.abs(pivot.getPos() - constants.pivotUpPos) < 5)) {
+            intakes.spinSetPos(constants.intakeSpinDefault);
             slides.slideSetPos(constants.highSpecimenPos);
+            intakes.pivotSetPos(constants.intakePivotGrabPos);
             pivot.setPow(0);
-            if ((Math.abs(slides.getLeftPos() - constants.highSpecimenPos) < 25) && Math.abs(slides.getRightPos() - constants.highSpecimenPos) < 25) {
+            telemetry.addLine("HI");
+            telemetry.update();
+            if (slides.getLeftPos() > 850) { // || Math.abs(slides.getRightPos() - constants.highSpecimenPos) < 25) {
                 currentState = AUTO_STATE.PATH_TO_SPEC_READY;
             }
         }

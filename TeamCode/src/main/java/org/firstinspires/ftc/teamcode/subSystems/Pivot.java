@@ -24,11 +24,16 @@ public class Pivot {
     public void pivotSetPos(int pos) {
         pivot.setTargetPosition(pos);
     }
-
     public void setPow(double pow) {
         pivot.setPower(pow);
     }
     public int getPos() {
         return pivot.getCurrentPosition();
+    }
+    public double getPow() {return pivot.getPower();}
+
+    public void resetPos() {
+        pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 }
