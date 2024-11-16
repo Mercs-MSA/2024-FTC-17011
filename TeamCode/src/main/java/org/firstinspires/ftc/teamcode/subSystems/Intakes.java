@@ -30,7 +30,7 @@ public class Intakes {
 
         intakeLeft.setDirection(CRServo.Direction.REVERSE);
 
-        intakeSpin.setDirection(Servo.Direction.REVERSE);
+
 
         intakeRight.setPower(0);
 

@@ -36,4 +36,11 @@ public class Pivot {
         pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
+
+    public void superReset() {
+        pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
 }
