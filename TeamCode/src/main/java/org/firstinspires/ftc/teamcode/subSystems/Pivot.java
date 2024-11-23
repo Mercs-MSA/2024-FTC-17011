@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subSystems;
 
+import static org.firstinspires.ftc.teamcode.Constants.pivotUpPos;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -37,10 +39,7 @@ public class Pivot {
         pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void superReset() {
-        pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    public void forceDown() {
+        pivot.setTargetPosition(-690);
     }
 }

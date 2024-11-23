@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -15,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
 
-public class OTOS {
+public class OTOS_Iterative {
     // Adjust these numbers to suit your robot.
     private static final double DRIVE_GAIN          = 0.05;    // Strength of axial position control
     private static final double DRIVE_ACCEL         = 1.5;     // Acceleration limit.  Percent Power change per second.  1.0 = 0-100% power in 1 sec.
@@ -71,7 +70,7 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
     private DcMotor rightBackDrive;     //  control the right back drive wheel
 
 
-    private final LinearOpMode myOpMode;
+    private final OpMode myOpMode;
     private SparkFunOTOS myOtos;
 //    private Datalog datalog;
     private VoltageSensor battery;
@@ -95,7 +94,7 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
     private int datalogCounter        = 0;
 
     // Robot Constructor
-    public OTOS(LinearOpMode opmode) {
+    public OTOS_Iterative(OpMode opmode) {
         myOpMode = opmode;
     }
 
@@ -189,6 +188,13 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
         aMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         aMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);  // Requires motor encoder cables to be hooked up.
         return aMotor;
+    }
+
+    public boolean isPowerZero() {
+        if (leftFrontDrive.getPower() == 0 && rightFrontDrive.getPower() == 0 && leftBackDrive.getPower() == 0 && rightBackDrive.getPower() == 0) {
+            return true;
+        }
+        return false;
     }
 
     private SparkFunOTOS setupSparkfunOTOS(String deviceName) {
@@ -287,7 +293,7 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
         yawController.reset();                          // Maintain last turn heading
         holdTimer.reset();
 
-        while (myOpMode.opModeIsActive() && readSensors()){
+        while (readSensors()){
 
             // implement desired axis powers
             moveRobot(driveController.getOutput(drivenDistance), strafeController.getOutput(strafedDistance), yawController.getOutput(heading));
@@ -301,7 +307,7 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
                 holdTimer.reset();
             }
             myOpMode.telemetry.update();
-            myOpMode.sleep(10);
+//            myOpMode.sleep(10);
         }
         stopRobot();
     }
@@ -329,7 +335,7 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
         yawController.reset();                          // Maintain last turn angle
         holdTimer.reset();
 
-        while (myOpMode.opModeIsActive() && readSensors()){
+        while (readSensors()){
 
             // implement desired axis powers
             moveRobot(driveController.getOutput(strafedDistance), strafeController.getOutput(drivenDistance), yawController.getOutput(heading));
@@ -343,7 +349,7 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
                 holdTimer.reset();
             }
             myOpMode.telemetry.update();
-            myOpMode.sleep(10);
+//            myOpMode.sleep(10);
         }
         stopRobot();
     }
@@ -357,7 +363,7 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
     public void turnTo(double headingDeg, double power, double holdTime) {
 
         yawController.reset(headingDeg, power);
-        while (myOpMode.opModeIsActive() && readSensors()) {
+        while (readSensors()) {
 
             // implement desired axis powers
             moveRobot(0, 0, yawController.getOutput(heading));
@@ -371,7 +377,7 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
                 holdTimer.reset();
             }
             myOpMode.telemetry.update();
-            myOpMode.sleep(10);
+//            myOpMode.sleep(10);
         }
         stopRobot();
     }
@@ -481,7 +487,7 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
  * to get an axis to the desired setpoint value.
  * It also implements an acceleration limit, and a max power output.
  */
-class ProportionalControl {
+class ProportionalControlB {
     double  lastOutput;
     double  gain;
     double  accelLimit;
@@ -499,7 +505,7 @@ class ProportionalControl {
 //    boolean checkpointLarge;
 //    boolean checkpointSmall;
 
-    public ProportionalControl(double gain, double accelLimit, double outputLimit, double tolerance, double deadband, boolean circular, OpMode opmode, String label) {
+    public ProportionalControlB(double gain, double accelLimit, double outputLimit, double tolerance, double deadband, boolean circular, OpMode opmode, String label) {
         this.gain = gain;
         this.accelLimit = accelLimit;
         this.defaultOutputLimit = outputLimit;

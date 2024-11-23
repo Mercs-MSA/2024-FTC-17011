@@ -180,6 +180,9 @@ public class TeleOp17011 extends LinearOpMode {
             slides.slideSetPos(0);
             pivotBool = true;
             pivot.pivotSetPos(pivotDownPos);
+        } else if (pivotBool && gamepad2.touchpad && gamepad2.dpad_down) {
+            pivotBool = true;
+            pivot.forceDown();
         }
 
         if (gamepad2.x) {
@@ -324,7 +327,7 @@ public class TeleOp17011 extends LinearOpMode {
 //            fieldCentricDrive();
             mechanumDrive();
 
-            if (pivot.getPos() <= (60) && pivotBool) {
+            if (pivot.getPos() <= (60) && pivotBool && !gamepad2.touchpad) {
                 pivot.setPow(0);
 //                if (slides.getLeftPos() > extendPos && slides.getRightPos() > extendPos) {
 //                    slides.slideSetPos(extendPos);
@@ -335,6 +338,8 @@ public class TeleOp17011 extends LinearOpMode {
                     pivot.setPow(0);
                 }
             } else if (pivot.getPos() > 60 && pivotBool) {
+                pivot.setPow(.4);
+            } else if (pivot.getPos() < 10 && pivotBool && gamepad2.touchpad) {
                 pivot.setPow(.4);
             }
 

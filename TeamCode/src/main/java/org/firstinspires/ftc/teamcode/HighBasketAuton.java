@@ -7,6 +7,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -22,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subSystems.Slides;
  */
 
 @Autonomous
+@Config
 public class HighBasketAuton extends LinearOpMode {
     FtcDashboard dash;
     private static double firstTurnAngle = -70;
@@ -59,6 +61,7 @@ public class HighBasketAuton extends LinearOpMode {
 
         // Run Auto if stop was not pressed.
         if (opModeIsActive()) {
+            sleep(4000);
             intakes.specSetPos(constants.specimenHoldPos);
             robot.drive(-20, 0.60, 0.1);
             intakes.pivotSetPos(constants.intakePivotScorePos);
@@ -80,47 +83,53 @@ public class HighBasketAuton extends LinearOpMode {
             intakes.specSetPos(constants.specimenScorePos); //Score specimen
             sleep(500);
             pivot.setPow(.6);
-            telemetry.addData("Pivot power: ", pivot.getPow());
-            telemetry.update();
+//            telemetry.addData("Pivot power: ", pivot.getPow());
+//            telemetry.update();
             slides.slideSetPos(0);
             sleep(300);
-            pivot.pivotSetPos(30);
+            pivot.pivotSetPos(constants.pivotDownPos);
             robot.drive(8, .1, .1);
-            pivot.setPow(0);
-            sleep(300);
             intakes.pivotSetPos(constants.intakePivotScorePos);
             sleep(300);
-            pivot.superReset();
-            robot.turnTo(firstTurnAngle, .4, .1); //Going to basket
-            robot.drive(toBasketDistance, .6, .1);
-            robot.turnTo(secondTurnAngle, .4, .1);
-            sleep(300);
-            intakes.setIntakePower(constants.intakeCollectPow); //First spike
-            while ((constants.extendPos - slides.getLeftPos()) > 10) {
-                intakes.pivotSetPos(constants.intakePivotGrabPos);
-                slides.slideSetPos(constants.extendPos);
-            }
-            sleep(700);
-            slides.slideSetPos(0);
-            pivot.setPow(1);
-            sleep(200);
-            while (pivot.getPos() < (constants.pivotUpPos - 50)) { //First up
-                pivot.pivotSetPos(constants.pivotUpPos);
-            }
-            while (slides.getLeftPos() < (constants.highBasketPos - 10)) {
-                slides.slideSetPos(constants.highBasketPos);
-            }
-            robot.drive(-2, .25, .1);
-            for (int i = 0; i < 50; i++) { //Score first sample
-                intakes.pivotSetPos(constants.intakePivotScorePos);
-                intakes.setIntakePower(constants.intakeScorePow);
-            }
-            robot.drive(3, .1, .1);
-            sleep(500);
             pivot.pivotSetPos(0);
-            slides.slideSetPos(0);
-            sleep(500);
-            robot.drive(2, .1, .1);
+            sleep(300);
+            robot.turnTo(firstTurnAngle, .4, .1); //Going to basket
+            robot.drive((toBasketDistance - 15), .6, .1);
+            pivot.resetPos();
+//            robot.turnTo(secondTurnAngle, .4, .1);
+//            intakes.pivotSetPos(constants.intakePivotGrabPos);
+//            sleep(300);
+//            intakes.setIntakePower(constants.intakeCollectPow); //First spike
+//            while ((constants.extendPosAuto - slides.getLeftPos()) > 10) {
+//                telemetry.addData("Pivot pos: ", pivot.getPos());
+//                telemetry.update();
+//                intakes.pivotSetPos(constants.intakePivotGrabPos);
+//                slides.slideSetPos(constants.extendPosAuto);
+//            }
+//            sleep(700);
+//            slides.slideSetPos(0);
+//            pivot.setPow(1);
+//            sleep(200);
+//            while (pivot.getPos() < (constants.pivotUpPos - 50)) { //First up
+//                telemetry.addData("Pivot pos: ", pivot.getPos());
+//                telemetry.update();
+//                pivot.pivotSetPos(constants.pivotUpPos);
+//            }
+//            robot.turnTo((secondTurnAngle - 35), .3, .1);
+//            while (slides.getLeftPos() < (constants.highBasketPos - 10)) {
+//                slides.slideSetPos(constants.highBasketPos);
+//            }
+//            robot.drive(-2, .25, .1);
+//            for (int i = 0; i < 100; i++) { //Score first sample
+//                intakes.pivotSetPos(constants.intakePivotScorePos);
+//                intakes.setIntakePower(constants.intakeScorePow);
+//            }
+//            robot.drive(3, .1, .1);
+//            sleep(500);
+//            pivot.pivotSetPos(0);
+//            slides.slideSetPos(0);
+//            sleep(500);
+//            robot.drive(2, .1, .1);
         }
         telemetry.update();
         robot.incrementOpModeCounter();
