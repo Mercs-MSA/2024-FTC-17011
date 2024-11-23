@@ -90,9 +90,9 @@ public class SpecimenAuto extends OpMode {
 //        }
     }
 
-    public void specReadyProcess() {
+    public void specReadyProcess() { //SCORING AHHHHH
         pivot.pivotSetPos(constants.pivotUpPos);
-        if (Math.abs(pivot.getPos() - constants.pivotUpPos) < 85) {
+        if (Math.abs(pivot.getPos() - constants.pivotUpPos) < 100) {
             slides.slideSetPos(constants.highSpecimenPos);
             if (robot.isPowerZero()) {
                 currentDriveState = AUTO_DRIVE_STATE.STAGING_TO_SCORE_STATE;
