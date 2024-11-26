@@ -18,15 +18,15 @@ public class OTOS_Iterative {
     // Adjust these numbers to suit your robot.
     private static final double DRIVE_GAIN          = 0.05;    // Strength of axial position control
     private static final double DRIVE_ACCEL         = 1.5;     // Acceleration limit.  Percent Power change per second.  1.0 = 0-100% power in 1 sec.
-    private static final double DRIVE_TOLERANCE     = 3;     // Controller is is "inPosition" if position error is < +/- this amount
+    public static double DRIVE_TOLERANCE     = 3;     // Controller is is "inPosition" if position error is < +/- this amount
     private static final double DRIVE_DEADBAND      = 0.2;     // Error less than this causes zero output.  Must be smaller than DRIVE_TOLERANCE
-    private static final double DRIVE_MAX_AUTO      = 0.6;     // "default" Maximum Axial power limit during autonomous
+    private static final double DRIVE_MAX_AUTO      = 1;     // "default" Maximum Axial power limit during autonomous
 
     private static final double STRAFE_GAIN         = 0.05;    // Strength of lateral position control
     private static final double STRAFE_ACCEL        = 1.5;     // Acceleration limit.  Percent Power change per second.  1.0 = 0-100% power in 1 sec.
-    private static final double STRAFE_TOLERANCE    = 2.5;     // Controller is is "inPosition" if position error is < +/- this amount
+    public static double STRAFE_TOLERANCE    = 2.5;     // Controller is is "inPosition" if position error is < +/- this amount
     private static final double STRAFE_DEADBAND     = 0.2;     // Error less than this causes zero output.  Must be smaller than DRIVE_TOLERANCE
-    private static final double STRAFE_MAX_AUTO     = 0.6;     // "default" Maximum Lateral power limit during autonomous
+    private static final double STRAFE_MAX_AUTO     = 1;     // "default" Maximum Lateral power limit during autonomous
 
     private static final double YAW_GAIN            = 0.01;    // Strength of Yaw position control
     private static final double YAW_ACCEL           = 0.5;     // Acceleration limit.  Percent Power change per second.  1.0 = 0-100% power in 1 sec.
@@ -354,6 +354,42 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
         stopRobot();
     }
 
+    public void diagonal(double targetDistance, double power, double holdTime) {
+        resetOdometry();
+
+        // if our target distance is negative, we're trying to drive backwards. But we're about to calculate
+        // distance driven, which will always be a positive number. So we need to track our intention to drive backwards
+        if (targetDistance < 0) {
+            driveInReverse = true;
+        }
+
+        SparkFunOTOS.Pose2D targetPosition = findTargetPosition(targetDistance);
+        // TODO This is where we can use targetPosition and currentPosition to find slope of target path. We can use slope in ReadSensors()
+
+//        driveController.reset(Math.abs(targetDistance), power);   // achieve desired drive distance
+//        strafeController.reset(0);              // Maintain zero strafe drift
+        yawController.reset();                          // Maintain last turn heading
+        holdTimer.reset();
+
+        while (readSensors()){
+
+            // implement desired axis powers
+            moveRobot(driveController.getOutput(drivenDistance), strafeController.getOutput(strafedDistance), yawController.getOutput(heading));
+
+            // Time to exit?
+            if (driveController.inPosition() && yawController.inPosition()) {
+                if (holdTimer.time() > holdTime) {
+                    break;   // Exit loop if we are in position, and have been there long enough.
+                }
+            } else {
+                holdTimer.reset();
+            }
+            myOpMode.telemetry.update();
+//            myOpMode.sleep(10);
+        }
+        stopRobot();
+    }
+
     /**
      * Rotate to an absolute heading/direction
      * @param headingDeg  Heading to obtain.  +ve = CCW, -ve = CW.
@@ -464,11 +500,11 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
     /**
      * Reset the robot heading to zero degrees, and also lock that heading into heading controller.
      */
-    public void resetHeading() {
+    public void resetHeading(double currentHeading) {
         readSensors();
         headingOffset = rawHeading;
         yawController.reset(0);
-        heading = 0;
+        heading = currentHeading;
     }
 
     public double getHeading() {return heading;}
@@ -606,55 +642,3 @@ class ProportionalControlB {
 //        checkpointSmall = false;
     }
 }
-
-/*
- * This class encapsulates all the fields that will go into the datalog.
- */
-//class Datalog
-//{
-//    // The underlying datalogger object - it cares only about an array of loggable fields
-//    private final Datalogger datalogger;
-//
-//    // These are all of the fields that we want in the datalog.
-//    // Note that order here is NOT important. The order is important in the setFields() call below
-//    public Datalogger.GenericField opModeStatus = new Datalogger.GenericField("OpModeStatus");
-//    public Datalogger.GenericField loopCounter  = new Datalogger.GenericField("Loop Counter");
-//
-//    public Datalogger.GenericField leftFrontEncoder = new Datalogger.GenericField("LF Enc");
-//    public Datalogger.GenericField rightFrontEncoder = new Datalogger.GenericField("RF Enc");
-//    public Datalogger.GenericField leftBackEncoder = new Datalogger.GenericField("LB Enc");
-//    public Datalogger.GenericField rightBackEncoder = new Datalogger.GenericField("RB Enc");
-//    public Datalogger.GenericField battery      = new Datalogger.GenericField("Battery");
-//
-//    public Datalog(String name)
-//    {
-//        // Build the underlying datalog object
-//        datalogger = new Datalogger.Builder()
-//
-//                // Pass through the filename
-//                .setFilename(name)
-//
-//                // Request an automatic timestamp field
-//                .setAutoTimestamp(Datalogger.AutoTimestamp.DECIMAL_SECONDS)
-//
-//                // Tell it about the fields we care to log.
-//                // Note that order *IS* important here! The order in which we list
-//                // the fields is the order in which they will appear in the log.
-//                .setFields(
-//                        opModeStatus,
-//                        loopCounter,
-//                        leftFrontEncoder,
-//                        rightFrontEncoder,
-//                        leftBackEncoder,
-//                        rightBackEncoder,
-//                        battery
-//                )
-//                .build();
-//    }
-//
-//    // Tell the datalogger to gather the values of the fields
-//    // and write a new line in the log.
-//    public void writeLine()
-//    {
-//        datalogger.writeLine();
-//    }
