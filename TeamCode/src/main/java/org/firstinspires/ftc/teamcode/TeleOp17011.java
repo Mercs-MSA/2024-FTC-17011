@@ -343,6 +343,10 @@ public class TeleOp17011 extends LinearOpMode {
                 pivot.setPow(.4);
             }
 
+            if (pivotBool && slides.getLeftPos() > extendPos && pivot.getPos() < pivotDownPos) {
+                slides.slideSetPos(extendPos);
+            }
+
             if (intPivotControl) {
                 intakes.pivotSetPos(intakePivotGrabPos);
             }

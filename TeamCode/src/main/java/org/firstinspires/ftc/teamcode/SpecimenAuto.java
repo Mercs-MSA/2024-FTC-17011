@@ -92,7 +92,7 @@ public class SpecimenAuto extends OpMode {
         if (!isDriving) {
             isDriving = true;
             robot.drive(4, .75, .1);
-            robot.turnTo(175, .4, .1);
+            robot.turnTo(175, .5, .1);
             robot.strafe(24, 1, .1);
             robot.drive(21,1,.1);
 //            robot.strafe(15.5,.6,.1); //Behind the first spike
@@ -102,10 +102,10 @@ public class SpecimenAuto extends OpMode {
 //            robot.drive(backAndForthDistance, .75, .1); //Second push
 //            robot.drive(-backAndForthDistance, .75, .1);
             STRAFE_TOLERANCE = 6;
-            robot.strafe(28.3,1,.1);
+            robot.strafe(24.3,1,.1);
             STRAFE_TOLERANCE = 2.5;
             DRIVE_TOLERANCE = 5.5;
-            robot.drive(-backAndForthDistance - 6, .75, .1); //Last push
+            robot.drive(-backAndForthDistance - 5, .75, .1); //Last push
             DRIVE_TOLERANCE = 3;
             intakes.specSetPos(Constants.specimenHoldPos);
             currentState = AUTO_STATE.INTAKE_STATE;
@@ -117,14 +117,16 @@ public class SpecimenAuto extends OpMode {
         if (!isDriving) {
             i = 0;
             isDriving = true;
-            robot.drive(18, 1, .1);
+            robot.turnTo(-114, .6, .1);
+//            robot.drive(18, 1, .1);
             if (a == 0) {
-                robot.strafe(-57.2, 1, .1);
+//                robot.strafe(-57.2, 1, .1);
+                robot.drive(59.5, 1, .1);
                 a++;
             } else {
                 robot.strafe(-60, 1, .1);
             }
-            robot.turnTo(0, .4, .1);
+            robot.turnTo(0, .5, .1);
             if (robot.isPowerZero()) {
                 currentState = AUTO_STATE.SPEC_READY_STATE;
             }

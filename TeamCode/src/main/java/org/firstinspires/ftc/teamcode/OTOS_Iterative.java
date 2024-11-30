@@ -354,41 +354,45 @@ counts per rotation of the arm. We divide that by 360 to get the counts per degr
         stopRobot();
     }
 
-    public void diagonal(double targetDistance, double power, double holdTime) {
-        resetOdometry();
-
-        // if our target distance is negative, we're trying to drive backwards. But we're about to calculate
-        // distance driven, which will always be a positive number. So we need to track our intention to drive backwards
-        if (targetDistance < 0) {
-            driveInReverse = true;
-        }
-
-        SparkFunOTOS.Pose2D targetPosition = findTargetPosition(targetDistance);
-        // TODO This is where we can use targetPosition and currentPosition to find slope of target path. We can use slope in ReadSensors()
-
-//        driveController.reset(Math.abs(targetDistance), power);   // achieve desired drive distance
-//        strafeController.reset(0);              // Maintain zero strafe drift
-        yawController.reset();                          // Maintain last turn heading
-        holdTimer.reset();
-
-        while (readSensors()){
-
-            // implement desired axis powers
-            moveRobot(driveController.getOutput(drivenDistance), strafeController.getOutput(strafedDistance), yawController.getOutput(heading));
-
-            // Time to exit?
-            if (driveController.inPosition() && yawController.inPosition()) {
-                if (holdTimer.time() > holdTime) {
-                    break;   // Exit loop if we are in position, and have been there long enough.
-                }
-            } else {
-                holdTimer.reset();
-            }
-            myOpMode.telemetry.update();
-//            myOpMode.sleep(10);
-        }
-        stopRobot();
-    }
+//    public void diagonal(double targetDistance, double power, double holdTime) {
+//        // if our target distance is negative, we're trying to drive backwards. But we're about to calculate
+//        // distance driven, which will always be a positive number. So we need to track our intention to drive backwards
+//        if (targetDistance < 0) {
+//            driveInReverse = true;
+//        }
+//
+//        SparkFunOTOS.Pose2D targetPosition = findTargetPosition(targetDistance);
+//        // TODO This is where we can use targetPosition and currentPosition to find slope of target path. We can use slope in ReadSensors()
+//
+////        driveController.reset(Math.abs(targetDistance), power);   // achieve desired drive distance
+////        strafeController.reset(0);              // Maintain zero strafe drift
+//        yawController.reset();                          // Maintain last turn heading
+//        holdTimer.reset();
+//
+//        while (readSensors()){
+//
+//            // implement desired axis powers
+//            moveRobot(driveController.getOutput(drivenDistance), strafeController.getOutput(strafedDistance), yawController.getOutput(heading));
+//
+//            // Time to exit?
+//            if (driveController.inPosition() && yawController.inPosition()) {
+//                if (holdTimer.time() > holdTime) {
+//                    break;   // Exit loop if we are in position, and have been there long enough.
+//                }
+//            } else {
+//                holdTimer.reset();
+//            }
+//            myOpMode.telemetry.update();
+////            myOpMode.sleep(10);
+//        }
+//        stopRobot();
+//    }
+public void diagonal(double targetDistance, double power, double holdTime) {
+    leftFrontDrive.setPower(-0.111111111111);
+    rightBackDrive.setPower(-0.111111111111);
+    leftBackDrive.setPower(1);
+    rightBackDrive.setPower(1);
+}
 
     /**
      * Rotate to an absolute heading/direction

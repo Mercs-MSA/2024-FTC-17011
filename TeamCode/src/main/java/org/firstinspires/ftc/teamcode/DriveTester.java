@@ -29,6 +29,10 @@ public class DriveTester extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+//            leftFrontDrive.setPower(-(0.488888888889)*2);
+//            rightBackDrive.setPower(-(0.488888888889)*2);
+//            leftBackDrive.setPower(1);
+//            rightFrontDrive.setPower(1);
             if (gamepad1.left_bumper) {
                 leftFrontDrive.setPower(-gamepad1.left_stick_y);
             }

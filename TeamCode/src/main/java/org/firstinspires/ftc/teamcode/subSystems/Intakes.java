@@ -59,4 +59,7 @@ public class Intakes {
     public void specSetPos(double pos) {
         specimenIntake.setPosition(pos);
     }
+    public double specCheckPos() {
+        return specimenIntake.getPosition();
+    }
 }
