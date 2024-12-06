@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.Constants.climbPos;
 import static org.firstinspires.ftc.teamcode.Constants.extendPos;
 import static org.firstinspires.ftc.teamcode.Constants.highBasketPos;
 import static org.firstinspires.ftc.teamcode.Constants.highSpecScorePos;
@@ -44,8 +45,8 @@ import static org.firstinspires.ftc.teamcode.Constants.intakeSpinBack;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinLeft;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinRight;
-import static org.firstinspires.ftc.teamcode.Constants.lowBasketPos;
 import static org.firstinspires.ftc.teamcode.Constants.normalSpeed;
+import static org.firstinspires.ftc.teamcode.Constants.pivotClimbPos;
 import static org.firstinspires.ftc.teamcode.Constants.pivotD;
 import static org.firstinspires.ftc.teamcode.Constants.pivotDownPos;
 import static org.firstinspires.ftc.teamcode.Constants.pivotF;
@@ -172,7 +173,7 @@ public class TeleOp17011 extends LinearOpMode {
         }
 
         if (gamepad2.dpad_right) {
-            slides.slideSetPos(lowBasketPos);
+            slides.slideSetPos(climbPos);
         }
 
         //Lift Down
@@ -193,6 +194,13 @@ public class TeleOp17011 extends LinearOpMode {
         if (pivotBool && Math.abs(gamepad2.left_stick_y) > .3) {
             slides.slideSetPos(slides.getLeftPos() + ((int) (-gamepad2.left_stick_y * 40)));
         }
+
+//        if (gamepad1.triangle && pivotBool) {
+//            pivotBool = false;
+//            pivot.pivotSetPos(pivotClimbPos);
+//        } else if (gamepad1.cross && !pivotBool) {
+//            pivot.pivotSetPos(pivotDownPos);
+//        }
     }
 
 
