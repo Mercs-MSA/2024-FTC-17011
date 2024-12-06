@@ -53,7 +53,7 @@ public class LocalizationTest extends OpMode {
     public void init() {
         poseUpdater = new PoseUpdater(hardwareMap);
 
-        poseUpdater.setStartingPose(startingPoseRight);
+        poseUpdater.setStartingPose(startingPoseLeft);
 
         dashboardPoseTracker = new DashboardPoseTracker(poseUpdater);
 

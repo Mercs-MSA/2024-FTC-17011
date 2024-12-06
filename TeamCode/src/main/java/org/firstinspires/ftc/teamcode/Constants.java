@@ -32,9 +32,9 @@ public class Constants {
     public static double pivotF = 1;
 
     public static int highBasketPos = 2200; //V1 - 2270
-    public static int lowBasketPos = 900; //V1 - 1210
+    public static int lowBasketPos = 900; //V1 - 1210hh
     public static int extendPos = 1400;
-    public static int extendPosAuto = 1400;
+    public static int extendPosAuto = 1300;
     public static int highSpecimenPos = 1340; //V1 - 1410
     public static int highSpecScorePos = 960; //V1 - 1050
     public final static double lowBasketInch = 0;
