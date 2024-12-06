@@ -46,7 +46,6 @@ import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinLeft;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinRight;
 import static org.firstinspires.ftc.teamcode.Constants.normalSpeed;
-import static org.firstinspires.ftc.teamcode.Constants.pivotClimbPos;
 import static org.firstinspires.ftc.teamcode.Constants.pivotD;
 import static org.firstinspires.ftc.teamcode.Constants.pivotDownPos;
 import static org.firstinspires.ftc.teamcode.Constants.pivotF;
