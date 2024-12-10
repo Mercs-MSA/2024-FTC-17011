@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.PoseUpdater;
 import org.firstinspires.ftc.teamcode.pedroPathing.util.DashboardPoseTracker;
 import org.firstinspires.ftc.teamcode.pedroPathing.util.Drawing;
@@ -46,6 +47,7 @@ public class LocalizationTest extends OpMode {
     private DcMotorEx rightRear;
     private List<DcMotorEx> motors;
 
+    private Pose newPose = new Pose(-11.25, 35.95, Math.toRadians(90));
     /**
      * This initializes the PoseUpdater, the mecanum drive motors, and the FTC Dashboard telemetry.
      */

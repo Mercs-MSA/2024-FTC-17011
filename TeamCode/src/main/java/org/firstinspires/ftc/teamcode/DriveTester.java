@@ -10,6 +10,7 @@ public class DriveTester extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+    private DcMotor pivot = null;
     @Override
     public void runOpMode() throws InterruptedException {
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -26,6 +27,9 @@ public class DriveTester extends LinearOpMode {
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        pivot = hardwareMap.get(DcMotor.class, "pivot");
+        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
         while (opModeIsActive()) {
@@ -44,6 +48,14 @@ public class DriveTester extends LinearOpMode {
             }
             if (gamepad1.right_trigger > .3) {
                 rightBackDrive.setPower(-gamepad1.left_stick_y);
+            }
+
+            if (gamepad2.triangle) {
+                pivot.setPower(1);
+            } else if (gamepad2.cross) {
+                pivot.setPower(-.5);
+            } else if (gamepad2.circle) {
+                pivot.setPower(0);
             }
 
             telemetry.addData("Left Front Power: ", leftFrontDrive.getPower());

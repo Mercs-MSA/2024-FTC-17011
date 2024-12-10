@@ -38,6 +38,7 @@ import static org.firstinspires.ftc.teamcode.Constants.intakeCollectPow;
 //import static org.firstinspires.ftc.teamcode.Constants.intakeHoldPos;
 import org.firstinspires.ftc.teamcode.subSystems.Intakes;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotGrabPos;
+import static org.firstinspires.ftc.teamcode.Constants.intakePivotMidPos;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
 //import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeScorePow;
@@ -99,6 +100,8 @@ public class TeleOp17011 extends LinearOpMode {
     public boolean intPivotControl = true;
 
     public double speedMultiplier;
+    private boolean climbTrue = false;
+    private boolean encoderTrue = true;
     FtcDashboard dash;
 
     private void initializeImu() {
@@ -148,6 +151,7 @@ public class TeleOp17011 extends LinearOpMode {
                 slides.slideSetPos(highBasketPos);
             } else if (pivotBool) {
                 slides.slideSetPos(extendPos);
+                intakes.pivotSetPos(intakePivotMidPos);
             }
         }
         if (gamepad2.dpad_left && pivotBool) {
@@ -160,6 +164,7 @@ public class TeleOp17011 extends LinearOpMode {
                 intakes.pivotSetPos(intakePivotGrabPos);
                 slides.slideSetPos(highSpecimenPos);
             } else if (pivotBool) {
+                intakes.pivotSetPos(intakePivotMidPos);
                 slides.slideSetPos(extendPos);
             }
         } else if (gamepad2.right_bumper) {
@@ -167,22 +172,45 @@ public class TeleOp17011 extends LinearOpMode {
                 intakes.specSetPos(specimenHoldPos);
                 slides.slideSetPos(highSpecScorePos);
             } else if (pivotBool) {
+                intakes.pivotSetPos(intakePivotMidPos);
                 slides.slideSetPos(extendPos);
             }
         }
 
-        if (gamepad2.dpad_right) {
+        if (gamepad2.dpad_right && !climbTrue) {
             slides.slideSetPos(climbPos);
+            intakes.pivotSetPos(intakePivotMidPos);
+            sleep(300);
+            climbTrue = true;
+        } else if (gamepad2.dpad_right && climbTrue){
+            slides.slideSetPos(0);
+            sleep(300);
+            climbTrue = false;
         }
 
         //Lift Down
         if (gamepad2.dpad_down) {
+            intakes.pivotSetPos(intakePivotMidPos);
             slides.slideSetPos(0);
             pivotBool = true;
             pivot.pivotSetPos(pivotDownPos);
-        } else if (pivotBool && gamepad2.touchpad && gamepad2.dpad_down) {
-            pivotBool = true;
-            pivot.forceDown();
+        }
+        if (gamepad2.touchpad) {
+            if (encoderTrue) {
+                encoderTrue = false;
+                pivotBool = true;
+                pivot.normalMode();
+                intakes.pivotSetPos(intakePivotMidPos);
+                sleep(200);
+            } else {
+                encoderTrue = true;
+                pivot.encoderMode(pivotP, pivotI, pivotD, pivotF);
+                sleep(200);
+            }
+        }
+
+        if (gamepad2.right_stick_y > .1) {
+            pivot.setPow(-1);
         }
 
         if (gamepad2.x) {
@@ -226,7 +254,7 @@ public class TeleOp17011 extends LinearOpMode {
 
         if (gamepad2.right_trigger > .3 && gamepad2.left_trigger < .3) {
             intakes.spinSetPos(intakeSpinRight);
-        } else if (gamepad2.left_trigger > .3 && gamepad2.left_trigger < .3) {
+        } else if (gamepad2.left_trigger > .3 && gamepad2.right_trigger < .3) {
             intakes.spinSetPos(intakeSpinLeft);
         } else if (gamepad2.right_trigger > .3 && gamepad2.left_trigger > .3) {
             intakes.spinSetPos(intakeSpinBack);
@@ -247,30 +275,37 @@ public class TeleOp17011 extends LinearOpMode {
     }
     private void fieldCentricDrive() {
         double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-        double x = gamepad1.left_stick_x; // Counteract imperfect strafing
+        double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
 
-        // Calculate the current angle of the robot (yaw) relative to the field.
-        double robotAngle = -Math.toRadians(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)); // Modify this to get the actual robot angle.
+        // This button choice was made so that it is hard to hit on accident,
+        // it can be freely changed based on preference.
+        // The equivalent button is start on Xbox-style controllers.
+        if (gamepad1.options) {
+            imu.resetYaw();
+        }
 
-        // Calculate the field-centric components of movement.
-        double fieldX = x * Math.cos(robotAngle) - y * Math.sin(robotAngle);
-        double fieldY = x * Math.sin(robotAngle) + y * Math.cos(robotAngle);
+        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+        // Rotate the movement direction counter to the bot's rotation
+        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+
+        rotX = rotX * 1.1;  // Counteract imperfect strafing
 
         // Denominator is the largest motor power (absolute value) or 1
         // This ensures all the powers maintain the same ratio,
         // but only if at least one is out of the range [-1, 1]
-        double denominator = Math.max(Math.abs(fieldY) + Math.abs(fieldX) + Math.abs(rx), 1);
-        double frontLeftPower = (fieldY + fieldX + rx) / denominator;
-        double backLeftPower = (fieldY - fieldX + rx) / denominator;
-        double frontRightPower = (fieldY - fieldX - rx) / denominator;
-        double backRightPower = (fieldY + fieldX - rx) / denominator;
+        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+        double leftFrontPower = (rotY + rotX + rx) / denominator;
+        double rightFrontPower = (rotY - rotX - rx) / denominator;
+        double leftBackPower = (rotY - rotX + rx) / denominator;
+        double rightBackPower = (rotY + rotX - rx) / denominator;
 
-        // Set the motor powers.
-        leftFrontDrive.setPower(frontLeftPower);
-        leftBackDrive.setPower(backLeftPower);
-        rightFrontDrive.setPower(frontRightPower);
-        rightBackDrive.setPower(backRightPower);
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
     }
 
     public void mechanumDrive() {
@@ -334,24 +369,26 @@ public class TeleOp17011 extends LinearOpMode {
 //            fieldCentricDrive();
             mechanumDrive();
 
-            if (pivot.getPos() <= (60) && pivotBool && !gamepad2.touchpad) {
-                pivot.setPow(0);
+            if (encoderTrue) {
+                if (pivot.getPos() <= (60) && pivotBool && !gamepad2.touchpad) {
+                    pivot.setPow(0);
 //                if (slides.getLeftPos() > extendPos && slides.getRightPos() > extendPos) {
 //                    slides.slideSetPos(extendPos);
 //                }
-            } else if (!pivotBool) {
-                pivot.setPow(1);
-                if (pivot.getPos() > 690) {
-                    pivot.setPow(0);
-                }
-            } else if (pivot.getPos() > 60 && pivotBool) {
-                pivot.setPow(.4);
-            } else if (pivot.getPos() < 10 && pivotBool && gamepad2.touchpad) {
-                pivot.setPow(.4);
-            }
+                } else if (!pivotBool) {
+                    pivot.setPow(.8);
+                    if (pivot.getPos() > 960) {
+                        pivot.setPow(0);
+                    }
+                } else if (pivot.getPos() > 60 && pivotBool) {
+                    pivot.setPow(.4);
+                } //else if (pivotBool && gamepad2.touchpad) {
+//                pivot.setPow(.8);
+//            }
 
-            if (pivotBool && slides.getLeftPos() > extendPos && pivot.getPos() < pivotDownPos) {
-                slides.slideSetPos(extendPos);
+                if (pivotBool && slides.getLeftPos() > extendPos && pivot.getPos() < pivotDownPos) {
+                    slides.slideSetPos(extendPos);
+                }
             }
 
             if (intPivotControl) {
@@ -372,6 +409,9 @@ public class TeleOp17011 extends LinearOpMode {
             }
 
             // Send calculated power to wheels
+            telemetry.addData("left pivot direction: ", pivot.leftPivot.getDirection());
+            telemetry.addData("right pivot direction: ", pivot.rightPivot.getDirection());
+//            telemetry.addData()
             telemetry.addData("Pivot: ", pivot.getPos());
             telemetry.addData("left slide: ", slides.getLeftPos());
             telemetry.addData("right slide: ", slides.getRightPos());

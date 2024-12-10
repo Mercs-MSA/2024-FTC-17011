@@ -37,7 +37,7 @@ public class PedroSpecimenAuto extends OpMode {
 //        PUSH_ALL_STATE,
 //        GO_TO_STAGING_STATE,
 //        GO_TO_INTAKE_STATE,
-//        END_STATE,
+//        PARK_STATE,
 //        DO_NOTHING_STATE,
 //    }
 //
@@ -50,6 +50,7 @@ public class PedroSpecimenAuto extends OpMode {
         WHILE_PUSHING_STATE,
         INTAKE_STATE,
         BACK_TO_INTAKE,
+        PARK_STATE,
         END_STATE,
         DO_NOTHING_STATE
     }
@@ -61,22 +62,22 @@ public class PedroSpecimenAuto extends OpMode {
     private int timeoutPeriod = 0;
     //------------------------------------------------------------------------------------------------------------------------
     public static final Pose specStagingPose = pointAndHeadingToPose(-11.25, 43.05, 90);
-    public static final Pose specScorePose = pointAndHeadingToPose(-12, 36.25, 90);
+    public static final Pose specScorePose = pointAndHeadingToPose(-9.75, 36.25, 90);
 
     public static final Pose firstStaging = pointAndHeadingToPose(-11.25, 40, 90);
     public static final Pose secondStaging = pointAndHeadingToPose(-35.14,42.23,90);
-    public static final Pose thirdStaging = pointAndHeadingToPose(-40,16.58,90);
-    public static final Pose firstPush = pointAndHeadingToPose(-52,16.58,90);
-    public static final Pose toObs = pointAndHeadingToPose(-52,53,90);
+    public static final Pose thirdStaging = pointAndHeadingToPose(-37,16.58,90);
+    public static final Pose firstPush = pointAndHeadingToPose(-57,16.58,90);
+    public static final Pose toObs = pointAndHeadingToPose(-50.5,53,90);
     public static final Pose secondPush = pointAndHeadingToPose(-65,17.33,90);
     public static final Pose backToObs = pointAndHeadingToPose(-64,59.52,90);
     public static final Pose toIntake = pointAndHeadingToPose(-35.33, 42, 270);
-    public static final Pose finalIntakePoint = pointAndHeadingToPose(-32.45,62.1,270);
+    public static final Pose finalIntakePoint = pointAndHeadingToPose(-32.75,61.7,270);
     
-    public static final Pose specScoreSecondPose = pointAndHeadingToPose(-3.25, 37.35, 89);
-    public static final Pose specScoreThirdPose = pointAndHeadingToPose(-8.25, 36.85, 89);
+    public static final Pose specScoreSecondPose = pointAndHeadingToPose(-3.25, 37.25, 89);
+    public static final Pose specScoreThirdPose = pointAndHeadingToPose(-8.25, 37.55, 89);
 
-    public static final Pose endPoint = pointAndHeadingToPose(-55.58,61,90);
+    public static final Pose endPoint = pointAndHeadingToPose(-59,68,270);
     //------------------------------------------------------------------------------------------------------------------------
     @Override
     public void init() {
@@ -88,12 +89,12 @@ public class PedroSpecimenAuto extends OpMode {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        follower.setMaxPower(.75);
+        follower.setMaxPower(.8);
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         telemetryA.update();
-        pivot.setPow(1);
+//        pivot.setPow(1);
     }
 
     public static Pose pointAndHeadingToPose(double x, double y, double headingInDegrees) {
@@ -200,16 +201,19 @@ public class PedroSpecimenAuto extends OpMode {
             currentState = primerState;
     }
 
-    boolean up = false;
+//    boolean up = false;
     private void processStaging() {
-        if (up) {
+//        if (up) {
             pivot.pivotSetPos(constants.pivotUpPos);
-            up = false;
-        }
-        if (Math.abs(pivot.getPos() - Constants.pivotUpPos) < 325) {
+//            up = false;
+//        }
+//        pivot.normalMode();
+//        pivot.setPow(1);
+        if (Math.abs(pivot.getPos() - Constants.pivotUpPos) < 275) {
             slides.slideSetPos(Constants.highSpecimenPos);
             if (Math.abs(slides.getLeftPos() - Constants.highSpecimenPos) < 50) {
                 makePath(specScorePose);
+                pivot.setPow(0);
                 currentState = AUTO_STATE.PATH_ACTIVE;
                 primerState = AUTO_STATE.SPEC_SCORE_STATE;
             }
@@ -228,7 +232,7 @@ public class PedroSpecimenAuto extends OpMode {
             } else if (specCount == 1) {
                 currentState = AUTO_STATE.BACK_TO_INTAKE;
             } else if (specCount >= 2) {
-                currentState = AUTO_STATE.END_STATE;
+                currentState = AUTO_STATE.PARK_STATE;
             }
         }
     }
@@ -296,6 +300,7 @@ public class PedroSpecimenAuto extends OpMode {
             counter2++;
         }
         if (counter < 40) {
+            follower.setMaxPower(.8);
             intakes.specSetPos(constants.specimenHoldPos);
             counter++;
         }
@@ -316,7 +321,13 @@ public class PedroSpecimenAuto extends OpMode {
     }
     
     public void processBackToIntake() {
-        makePath(finalIntakePoint);
+        follower.setMaxPower(.6);
+        Path segmentEight = new Path(new BezierCurve(poseToPoint(follower.getPose()), poseToPoint(toIntake)));
+        segmentEight.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(270), 1);
+        Path segmentNine = new Path(new BezierCurve(poseToPoint(toIntake), poseToPoint(finalIntakePoint)));
+        segmentNine.setLinearHeadingInterpolation(Math.toRadians(268), Math.toRadians(268), 1);
+        PathChain secondCurve = new PathChain(segmentEight, segmentNine);
+        follower.followPath(secondCurve, true);
         currentState = AUTO_STATE.PATH_ACTIVE;
         primerState = AUTO_STATE.INTAKE_STATE;
     }
@@ -324,8 +335,26 @@ public class PedroSpecimenAuto extends OpMode {
     public void processParkAndFinish() {
         makePath(endPoint);
         currentState = AUTO_STATE.PATH_ACTIVE;
-        primerState = AUTO_STATE.DO_NOTHING_STATE;
+        primerState = AUTO_STATE.END_STATE;
     }
+
+    int bruh = 0;
+//    public void processEndState() {
+//        intakes.pivotSetPos(constants.intakePivotMidPos);
+//        if (bruh == 0) {
+//            pivot.normalMode();
+//            bruh++;
+//        }
+//        pivot.setPow(-1);
+////        if (bruh < 400) {
+////            pivot.setPow(.6);
+////            intakes.pivotSetPos(constants.intakePivotMidPos);
+////            pivot.pivotSetPos(-160);
+////            bruh++;
+////        } else {
+////            currentState = AUTO_STATE.DO_NOTHING_STATE;
+////        }
+//    }
 
     private void processDoNothing() {}
 
@@ -338,7 +367,8 @@ public class PedroSpecimenAuto extends OpMode {
             case WHILE_PUSHING_STATE: processPushingSamples(); break;
             case INTAKE_STATE: processIntake(); break;
             case BACK_TO_INTAKE: processBackToIntake(); break;
-            case END_STATE: processParkAndFinish(); break;
+            case PARK_STATE: processParkAndFinish(); break;
+//            case END_STATE: processEndState(); break;
             case DO_NOTHING_STATE: processDoNothing(); break;
         }
     }
@@ -349,6 +379,14 @@ public class PedroSpecimenAuto extends OpMode {
         checkIfStalled();
 
         processStateMachine();
+        if (currentState == AUTO_STATE.PARK_STATE) {
+            intakes.pivotSetPos(constants.intakePivotMidPos);
+            if (bruh == 0) {
+                pivot.normalMode();
+                bruh++;
+            }
+            pivot.setPow(-1);
+        }
 
         telemetry.addData("pivot pos: ", pivot.getPos());
         telemetry.addData("current state: ", currentState);

@@ -41,7 +41,7 @@ public class FollowerConstants {
 
     // Translational PIDF coefficients (don't use integral)
     public static CustomPIDFCoefficients translationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.1,
+            0.095,
             0,
             0,
             0);
@@ -59,7 +59,7 @@ public class FollowerConstants {
 
     // Heading error PIDF coefficients
     public static CustomPIDFCoefficients headingPIDFCoefficients = new CustomPIDFCoefficients(
-            1,
+            .5,
             0,
             0,
             0);
@@ -94,11 +94,11 @@ public class FollowerConstants {
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
     // if not negative, then the robot thinks that its going to go faster under 0 power
-    public static double forwardZeroPowerAcceleration = -1; //-20.96460206456467;
+    public static double forwardZeroPowerAcceleration = -.5; //-20.96460206456467;
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
     // if not negative, then the robot thinks that its going to go faster under 0 power
-    public static double lateralZeroPowerAcceleration = -1; //-80.62485150425947;
+    public static double lateralZeroPowerAcceleration = -.6; //-80.62485150425947;
 
     // A multiplier for the zero power acceleration to change the speed the robot decelerates at
     // the end of paths.
@@ -133,7 +133,7 @@ public class FollowerConstants {
     // When the Path is considered at its end parametrically, then the Follower has this many
     // milliseconds to further correct by default.
     // This can be custom set for each Path.
-    public static double pathEndTimeoutConstraint = 500;
+    public static double pathEndTimeoutConstraint = 150;
 
     // This is how many steps the BezierCurve class uses to approximate the length of a BezierCurve.
     public static int APPROXIMATION_STEPS = 1000;
