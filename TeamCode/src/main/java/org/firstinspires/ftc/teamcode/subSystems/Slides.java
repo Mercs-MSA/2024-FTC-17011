@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subSystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Slides {
@@ -10,7 +11,7 @@ public class Slides {
 
     public Slides(HardwareMap hardwareMap) throws InterruptedException {
         leftSlide = hardwareMap.get(DcMotorEx.class, "leftSlide");;
-//        leftSlide.setDirection(DcMotor.Direction.REVERSE);
+        leftSlide.setDirection(DcMotor.Direction.REVERSE);
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftSlide.setTargetPosition(0);
@@ -18,7 +19,8 @@ public class Slides {
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         rightSlide = hardwareMap.get(DcMotorEx.class, "rightSlide");
-        rightSlide.setDirection(DcMotor.Direction.REVERSE);
+//        rightSlide.setDirection(DcMotor.Direction.REVERSE); //V2
+        rightSlide.setDirection(DcMotor.Direction.FORWARD);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlide.setTargetPosition(0);
@@ -31,11 +33,24 @@ public class Slides {
         rightSlide.setTargetPosition(pos);
     }
 
+    public double getPow() {
+        if (leftSlide.getPower() == rightSlide.getPower()) {
+            return leftSlide.getPower();
+        } else {
+            return (leftSlide.getPower() + rightSlide.getPower()) / 2;
+        }
+    }
+
     public int getRightPos() {
         return rightSlide.getCurrentPosition();
     }
 
     public int getLeftPos() {
         return leftSlide.getCurrentPosition();
+    }
+
+    public void setPow(double pow) {
+        leftSlide.setPower(pow);
+        rightSlide.setPower(pow);
     }
 }

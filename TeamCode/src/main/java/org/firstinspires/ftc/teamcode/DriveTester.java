@@ -10,7 +10,7 @@ public class DriveTester extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-    private DcMotor pivot = null;
+//    private DcMotor pivot = null;
     @Override
     public void runOpMode() throws InterruptedException {
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -18,18 +18,18 @@ public class DriveTester extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRight");
         rightBackDrive = hardwareMap.get(DcMotor.class, "backRight");
 
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - FORWARD
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - FORWARD
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - REVERSE //V2 - FORWARD
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - REVERSE //V2 - FORWARD
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - FORWARD //V2 - REVERSE
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - FORWARD //V2 - REVERSE
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        pivot = hardwareMap.get(DcMotor.class, "pivot");
-        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        pivot = hardwareMap.get(DcMotor.class, "pivot");
+//        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
         while (opModeIsActive()) {
@@ -50,13 +50,13 @@ public class DriveTester extends LinearOpMode {
                 rightBackDrive.setPower(-gamepad1.left_stick_y);
             }
 
-            if (gamepad2.triangle) {
-                pivot.setPower(1);
-            } else if (gamepad2.cross) {
-                pivot.setPower(-.5);
-            } else if (gamepad2.circle) {
-                pivot.setPower(0);
-            }
+//            if (gamepad2.triangle) {
+//                pivot.setPower(1);
+//            } else if (gamepad2.cross) {
+//                pivot.setPower(-.5);
+//            } else if (gamepad2.circle) {
+//                pivot.setPower(0);
+//            }
 
             telemetry.addData("Left Front Power: ", leftFrontDrive.getPower());
             telemetry.addData("Right Front Power: ", rightFrontDrive.getPower());

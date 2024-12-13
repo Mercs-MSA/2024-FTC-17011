@@ -368,7 +368,6 @@ public class PedroSpecimenAuto extends OpMode {
             case INTAKE_STATE: processIntake(); break;
             case BACK_TO_INTAKE: processBackToIntake(); break;
             case PARK_STATE: processParkAndFinish(); break;
-//            case END_STATE: processEndState(); break;
             case DO_NOTHING_STATE: processDoNothing(); break;
         }
     }

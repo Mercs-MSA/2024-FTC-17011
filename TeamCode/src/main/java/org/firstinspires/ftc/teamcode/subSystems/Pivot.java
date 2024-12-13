@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 public class Pivot {
 //    private DcMotorEx pivot; //V2
-    public DcMotorEx rightPivot; //V3
-    public DcMotorEx leftPivot; //V3
+    private DcMotorEx rightPivot; //V3
+    private DcMotorEx leftPivot; //V3
 
     public Pivot(HardwareMap hardwareMap, double p, double i, double d, double f) throws InterruptedException {
 //        pivot = hardwareMap.get(DcMotorEx.class, "pivot");

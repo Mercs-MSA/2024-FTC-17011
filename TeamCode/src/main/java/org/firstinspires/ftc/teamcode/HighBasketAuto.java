@@ -25,7 +25,6 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstan
 public class HighBasketAuto extends OpMode {
     private Telemetry telemetryA;
 
-
     private Constants constants;
     private Follower follower;
     //    private double botHeading = startingPoseLeft.getHeading();
@@ -33,29 +32,21 @@ public class HighBasketAuto extends OpMode {
     private Pivot pivot;
     private Slides slides;
 
-
     private enum AUTO_STATE {
-        TEST,
         START_STATE,
         PATH_ACTIVE,
         DO_NOTHING,
         PATH_TO_BASKET_READY,
-        FIRST_SPIKE_READY,
-        FIRST_BASKET_READY,
-        SECOND_SPIKE_READY,
-        SECOND_SPIKE_PICKUP,
-        SECOND_BASKET_READY,
-        THIRD_SPIKE_READY,
-        THIRD_SPIKE_PICKUP,
+        GO_TO_FIRST_SPIKE,
+        GO_TO_SECOND_SPIKE,
+        GO_TO_THIRD_SPIKE,
         SCORE_BASKET,
-        FIRST_SPIKE_PICKUP,
-        FIRST_SPIKE_FINISH,
+        MECHANISMS_RESET,
+        PICKUP_SPIKE
     }
-
 
     private AUTO_STATE currentState = AUTO_STATE.START_STATE;
     private AUTO_STATE primerState = AUTO_STATE.START_STATE;
-
 
     private static ElapsedTime timeoutTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private int timeoutPeriod = 0;
@@ -65,16 +56,6 @@ public class HighBasketAuto extends OpMode {
     public static final Pose firstSpikePos = pointAndHeadingToPose(-50.6101, -52.03, 90.3263); //This is the rightmost spike, and insert correct points
     public static final Pose secondSpikePos = pointAndHeadingToPose(0, -53.03, 90);
     public static final Pose thirdSpikePos = pointAndHeadingToPose(0, -53.03, 90);
-    //------------------------------------------------------------------------------------------------------------------------
-//    public static final double startToSpecHeading = Math.toRadians(270);
-//    public static final double specToBasketHeading = Math.toRadians(45);
-    public static final double spikeOneHeading = Math.toRadians(0);
-    public static final double spikeTwoHeading = Math.toRadians(0);
-//    public static final Pose defaultPose = new Pose(-10,-10,0);
-//    public static final Point defaultPoint = new Point(-10, -10, Point.CARTESIAN);
-//    public static final Point testPoint = new Point(0, -10, Point.CARTESIAN);
-//    public static final Path testPath = new Path(new BezierCurve(defaultPoint, testPoint));
-
 
 
 
@@ -98,13 +79,11 @@ public class HighBasketAuto extends OpMode {
         telemetryA.update();
     }
 
-
     public void initializeSubSystems() throws InterruptedException {
         intakes = new Intakes(hardwareMap);
         pivot = new Pivot(hardwareMap, constants.pivotP, constants.pivotI, constants.pivotD, constants.pivotF);
         slides = new Slides(hardwareMap);
     }
-
 
     private void setupPath(Path pathToFollow, double endHeading) {
         double currentHeading = endHeading;
@@ -112,19 +91,9 @@ public class HighBasketAuto extends OpMode {
         pathToFollow.setLinearHeadingInterpolation(follower.getPose().getHeading(), endHeading, .7);
     }
 
-
-
-
-    private void restartTimeout(int timeout) {
-        timeoutPeriod = timeout;
-        timeoutTimer.reset();
-    }
-
-
     private boolean pathIsBusy() {
         return follower.isBusy();
     }
-
 
     private boolean hasTimedOut() {
         if (timeoutTimer.time() < timeoutPeriod)
@@ -133,26 +102,9 @@ public class HighBasketAuto extends OpMode {
             return true;
     }
 
-
-    //Close Specimen Intake
-    //Drive "Backwards" close to Submersible
-    //Pivot Up >> Slides Up
-    //Drive "Backwards" into Scoring Position
-    //Slides Down >> Specimen Open
-    //All set to zero & Intake Pivot to Grab Pos
-    //Drive to Baskets
-    //Turn if Needed
-    //Extend Lifts & Spin Intake
-    //Close Intake
-    //Pull Back
-    //Pivot Up >> Slides Up
-    //Intake Pivot Scoring Pos >> Open >> Grab Pos
-    //Repeat Last 6 for Second Yellow
-    //All set to zero
     private static Pose pointAndHeadingToPose(double x, double y, double headingInDegrees) {
         return new Pose(x, y, Math.toRadians(headingInDegrees));
     }
-
     public void makePath(Pose targetPose) {
         Point targetPoint = poseToPoint(targetPose);
         double targetHeading = targetPose.getHeading();
@@ -179,11 +131,31 @@ public class HighBasketAuto extends OpMode {
                     counter++;
                 } else {
                     intakes.setIntakePower(constants.intakeScorePow);
-                    counter = 0;
-                    if (samplesAcquired == 0)
-                        currentState = AUTO_STATE.FIRST_SPIKE_READY;
-                    if (samplesAcquired == 1)
-                        currentState = AUTO_STATE.SECOND_SPIKE_READY;
+                    currentState = AUTO_STATE.MECHANISMS_RESET;
+                }
+            }
+        }
+    }
+
+    public void processResetMechanisms() {
+        counter = 0;
+        counter2 = 0;
+        intakes.setIntakePower(0);
+        intakes.pivotSetPos(constants.intakePivotMidPos);
+        slides.slideSetPos(0);
+        if (slides.getLeftPos() < 200) {
+            pivot.pivotSetPos(-60);
+            if (pivot.getPos() < 0) {
+                pivot.resetPos();
+                if (samplesAcquired == 0 && !lastStatePickUp)
+                    currentState = AUTO_STATE.GO_TO_FIRST_SPIKE;
+                else if (samplesAcquired == 1 && !lastStatePickUp)
+                    currentState = AUTO_STATE.GO_TO_SECOND_SPIKE;
+                else if (samplesAcquired == 2 && !lastStatePickUp)
+                    currentState = AUTO_STATE.GO_TO_THIRD_SPIKE;
+                else if (lastStatePickUp) {
+                    lastStatePickUp = false;
+                    currentState = AUTO_STATE.PATH_TO_BASKET_READY;
                 }
             }
         }
@@ -192,53 +164,36 @@ public class HighBasketAuto extends OpMode {
     public void processFirstSpike() {
         makePath(firstSpikePos);
         currentState = AUTO_STATE.PATH_ACTIVE;
-        primerState = AUTO_STATE.FIRST_SPIKE_PICKUP;
+        primerState = AUTO_STATE.PICKUP_SPIKE;
     }
 
     public void processSecondSpike() {
         makePath(secondSpikePos);
         currentState = AUTO_STATE.PATH_ACTIVE;
-        primerState = AUTO_STATE.SECOND_SPIKE_READY;
+        primerState = AUTO_STATE.PICKUP_SPIKE;
     }
 
     public void processThirdSpike() {
         makePath(thirdSpikePos);
         currentState = AUTO_STATE.PATH_ACTIVE;
-        primerState = AUTO_STATE.THIRD_SPIKE_PICKUP;
-    }
-
-    int i = 0;
-    public void processFirstSpikePickUp() {
-        intakes.setIntakePower(0);
-        intakes.pivotSetPos(constants.intakePivotMidPos);
-        if (i == 0)
-            slides.slideSetPos(0);
-        if (slides.getLeftPos() < 200) {
-            if (i == 0) {
-                pivot.pivotSetPos(-60);
-                i++;
-            }
-            if (pivot.getPos() < 0) {
-                pivot.resetPos();
-                slides.slideSetPos(800);
-                currentState = AUTO_STATE.FIRST_SPIKE_FINISH;
-                // add next state
-            }
-        }
+        primerState = AUTO_STATE.PICKUP_SPIKE;
     }
 
     int counter2 = 0;
     int samplesAcquired = 0;
-    public void processFirstSpikeFinish() {
+    boolean lastStatePickUp = false;
+    public void processSpikePickUp() {
+        lastStatePickUp = true;
+        intakes.setIntakePower(constants.intakeCollectPow);
         intakes.pivotSetPos(constants.intakePivotGrabPos);
+        if (Math.abs(slides.getPow() - 1) < .5)
+            slides.setPow(.5);
         if (counter2 < 50) {
             slides.slideSetPos(extendPosAuto);
-            intakes.setIntakePower(constants.intakeCollectPow);
             counter2++;
         } else {
             samplesAcquired++;
-            slides.slideSetPos(0);
-            currentState = AUTO_STATE.PATH_TO_BASKET_READY;
+            currentState = AUTO_STATE.MECHANISMS_RESET;
         }
     }
 
@@ -254,31 +209,25 @@ public class HighBasketAuto extends OpMode {
         }
     }
 
-
-
-
     public void processDoNothing() {}
     private void processStateMachine() {
         switch(currentState) {
             case START_STATE: processStartState(); break;
             case PATH_ACTIVE: processPathActive(); break;
             case SCORE_BASKET: processScoreState(); break;
+            case MECHANISMS_RESET: processResetMechanisms(); break;
+            case PICKUP_SPIKE: processSpikePickUp(); break;
             case PATH_TO_BASKET_READY: processGoToBasket(); break;
-            case FIRST_SPIKE_READY: processFirstSpike(); break;
-            case FIRST_SPIKE_PICKUP: processFirstSpikePickUp(); break;
-            case FIRST_SPIKE_FINISH: processFirstSpikeFinish(); break;
-            case SECOND_SPIKE_READY: processSecondSpike(); break;
-
-            case THIRD_SPIKE_READY: processThirdSpike(); break;
+            case GO_TO_FIRST_SPIKE: processFirstSpike(); break;
+            case GO_TO_SECOND_SPIKE: processSecondSpike(); break;
+            case GO_TO_THIRD_SPIKE: processThirdSpike(); break;
             case DO_NOTHING: processDoNothing(); break;
         }
     }
 
-
     @Override
     public void loop() {
         processStateMachine();
-
 
         follower.update();
         telemetry.addData("counter: ", counter);

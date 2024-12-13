@@ -121,10 +121,10 @@ public class TeleOp17011 extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRight");
         rightBackDrive = hardwareMap.get(DcMotor.class, "backRight");
 
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - FORWARD
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - FORWARD
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - REVERSE //V2 - FORWARD
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - REVERSE //V2 - FORWARD
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - FORWARD //V2 - REVERSE
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - FORWARD //V2 - REVERSE
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -194,7 +194,11 @@ public class TeleOp17011 extends LinearOpMode {
             slides.slideSetPos(0);
             pivotBool = true;
             pivot.pivotSetPos(pivotDownPos);
+        } else if (gamepad2.x) { // Lift up
+            pivotBool = false;
+            pivot.pivotSetPos(pivotUpPos);
         }
+
         if (gamepad2.touchpad) {
             if (encoderTrue) {
                 encoderTrue = false;
@@ -213,13 +217,9 @@ public class TeleOp17011 extends LinearOpMode {
             pivot.setPow(-1);
         }
 
-        if (gamepad2.x) {
-            pivotBool = false;
-            pivot.pivotSetPos(pivotUpPos);
-        }
 
-        if (pivotBool && Math.abs(gamepad2.left_stick_y) > .3) {
-            slides.slideSetPos(slides.getLeftPos() + ((int) (-gamepad2.left_stick_y * 40)));
+        if (Math.abs(gamepad2.left_stick_y) > .3) {
+            slides.slideSetPos(slides.getLeftPos() + ((int) (-gamepad2.left_stick_y * 70)));
         }
 
 //        if (gamepad1.triangle && pivotBool) {
@@ -270,7 +270,7 @@ public class TeleOp17011 extends LinearOpMode {
             intakes.pivotSetPos(intakePivotGrabPos);
         } else if (gamepad2.b) {
             intPivotControl = false;
-            intakes.pivotSetPos(.3);
+            intakes.pivotSetPos(intakePivotMidPos);
         }
     }
     private void fieldCentricDrive() {
@@ -370,21 +370,16 @@ public class TeleOp17011 extends LinearOpMode {
             mechanumDrive();
 
             if (encoderTrue) {
-                if (pivot.getPos() <= (60) && pivotBool && !gamepad2.touchpad) {
+                if (pivot.getPos() <= (20) && pivotBool && !gamepad2.touchpad) {
                     pivot.setPow(0);
-//                if (slides.getLeftPos() > extendPos && slides.getRightPos() > extendPos) {
-//                    slides.slideSetPos(extendPos);
-//                }
                 } else if (!pivotBool) {
-                    pivot.setPow(.8);
-                    if (pivot.getPos() > 960) {
+                    pivot.setPow(.55);
+                    if (pivot.getPos() > 240) {
                         pivot.setPow(0);
                     }
-                } else if (pivot.getPos() > 60 && pivotBool) {
-                    pivot.setPow(.4);
-                } //else if (pivotBool && gamepad2.touchpad) {
-//                pivot.setPow(.8);
-//            }
+                } else if (pivot.getPos() > 20 && pivotBool) {
+                    pivot.setPow(.35);
+                }
 
                 if (pivotBool && slides.getLeftPos() > extendPos && pivot.getPos() < pivotDownPos) {
                     slides.slideSetPos(extendPos);
@@ -408,10 +403,6 @@ public class TeleOp17011 extends LinearOpMode {
                 speedMultiplier = normalSpeed;
             }
 
-            // Send calculated power to wheels
-            telemetry.addData("left pivot direction: ", pivot.leftPivot.getDirection());
-            telemetry.addData("right pivot direction: ", pivot.rightPivot.getDirection());
-//            telemetry.addData()
             telemetry.addData("Pivot: ", pivot.getPos());
             telemetry.addData("left slide: ", slides.getLeftPos());
             telemetry.addData("right slide: ", slides.getRightPos());
