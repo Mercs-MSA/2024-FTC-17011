@@ -132,11 +132,20 @@ public class PedroSpecimenAuto extends OpMode {
         setupPath(new Path(new BezierCurve(poseToPoint(follower.getPose()), targetPoint)), targetHeading);
     }
 
+    int busyCount = 0;
     private boolean pathIsBusy() {
-        if (robotStalled) {
-            return false;
+        busyCount++;
+        if (busyCount > 10) {
+            if (robotStalled) {
+                busyCount = 0;
+                return false;
+            } else {
+                if (!follower.isBusy())
+                    busyCount = 0;
+                return follower.isBusy();
+            }
         } else {
-            return follower.isBusy();
+            return true;
         }
     }
     private double[] deltaTracking = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -200,14 +209,8 @@ public class PedroSpecimenAuto extends OpMode {
             currentState = primerState;
     }
 
-//    boolean up = false;
     private void processStaging() {
-//        if (up) {
         pivot.pivotSetPos(constants.pivotUpPos);
-//            up = false;
-//        }
-//        pivot.normalMode();
-//        pivot.setPow(1);
         if (Math.abs(pivot.getPos() - Constants.pivotUpPos) < 65) {
             slides.slideSetPos(Constants.highSpecimenPos);
             if (Math.abs(slides.getLeftPos() - Constants.highSpecimenPos) < 50) {
@@ -235,9 +238,9 @@ public class PedroSpecimenAuto extends OpMode {
             }
         }
     }
-    int i = 0;
+    int pushingCount = 0;
     private void processPushingSamples() {
-        if (i == 0) {
+        if (pushingCount == 0) {
 //            Path segmentOne = new Path(new BezierCurve(poseToPoint(follower.getPose()), poseToPoint(firstStaging)));
 //            segmentOne.setLinearHeadingInterpolation(follower.getPose().getHeading(), Math.toRadians(90), 1);
 //            Path segmentTwo = new Path(new BezierCurve(poseToPoint(firstStaging), poseToPoint(secondStaging)));
@@ -245,40 +248,40 @@ public class PedroSpecimenAuto extends OpMode {
 //            PathChain firstCurve = new PathChain(segmentOne, segmentTwo);
 //            follower.followPath(firstCurve, true);
             makePath(firstStaging);
-            i++;
+            pushingCount++;
             currentState = AUTO_STATE.PATH_ACTIVE;
             primerState = AUTO_STATE.WHILE_PUSHING_STATE;
-        } else if (i == 1) {
+        } else if (pushingCount == 1) {
             makePath(secondStaging);
-            i++;
+            pushingCount++;
             currentState = AUTO_STATE.PATH_ACTIVE;
             primerState = AUTO_STATE.WHILE_PUSHING_STATE;
-        } else if (i == 2) {
+        } else if (pushingCount == 2) {
             makePath(thirdStaging);
-            i++;
+            pushingCount++;
             currentState = AUTO_STATE.PATH_ACTIVE;
             primerState = AUTO_STATE.WHILE_PUSHING_STATE;
-        } else if (i == 3) {
+        } else if (pushingCount == 3) {
             makePath(firstPush);
-            i++;
+            pushingCount++;
             currentState = AUTO_STATE.PATH_ACTIVE;
             primerState = AUTO_STATE.WHILE_PUSHING_STATE;
-        } else if (i == 4) {
+        } else if (pushingCount == 4) {
             makePath(toObs);
-            i++;
+            pushingCount++;
             currentState = AUTO_STATE.PATH_ACTIVE;
             primerState = AUTO_STATE.WHILE_PUSHING_STATE;
-//        } else if (i == 4) {
+//        } else if (pushingCount == 4) {
 //            makePath(secondPush);
-//            i++;
+//            pushingCount++;
 //            currentState = AUTO_STATE.PATH_ACTIVE;
 //            primerState = AUTO_STATE.WHILE_PUSHING_STATE;
-//        } else if (i == 5) {
+//        } else if (pushingCount == 5) {
 //            makePath(backToObs);
-//            i++;
+//            pushingCount++;
 //            currentState = AUTO_STATE.PATH_ACTIVE;
 //            primerState = AUTO_STATE.WHILE_PUSHING_STATE;
-        } else if (i == 5) {
+        } else if (pushingCount == 5) {
             Path segmentEight = new Path(new BezierCurve(poseToPoint(toObs), poseToPoint(toIntake)));
             segmentEight.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(270), 1);
             Path segmentNine = new Path(new BezierCurve(poseToPoint(toIntake), poseToPoint(finalIntakePoint)));
@@ -322,7 +325,7 @@ public class PedroSpecimenAuto extends OpMode {
     public void processBackToIntake() {
         follower.setMaxPower(.6);
         if (specCount == 1)
-            follower.setMaxPower(.45);
+            follower.setMaxPower(.5);
         Path segmentEight = new Path(new BezierCurve(poseToPoint(follower.getPose()), poseToPoint(toIntake)));
         segmentEight.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(270), 1);
         Path segmentNine = new Path(new BezierCurve(poseToPoint(toIntake), poseToPoint(finalIntakePoint)));
@@ -340,22 +343,6 @@ public class PedroSpecimenAuto extends OpMode {
     }
 
     int bruh = 0;
-//    public void processEndState() {
-//        intakes.pivotSetPos(constants.intakePivotMidPos);
-//        if (bruh == 0) {
-//            pivot.normalMode();
-//            bruh++;
-//        }
-//        pivot.setPow(-1);
-////        if (bruh < 400) {
-////            pivot.setPow(.6);
-////            intakes.pivotSetPos(constants.intakePivotMidPos);
-////            pivot.pivotSetPos(-160);
-////            bruh++;
-////        } else {
-////            currentState = AUTO_STATE.DO_NOTHING_STATE;
-////        }
-//    }
 
     private void processDoNothing() {}
 
@@ -388,6 +375,7 @@ public class PedroSpecimenAuto extends OpMode {
             pivot.setPow(-1);
         }
 
+        telemetry.addData("pushing integer: ", pushingCount);
         telemetry.addData("follower busy?: ", follower.isBusy());
         telemetry.addData("pivot pos: ", pivot.getPos());
         telemetry.addData("current state: ", currentState);

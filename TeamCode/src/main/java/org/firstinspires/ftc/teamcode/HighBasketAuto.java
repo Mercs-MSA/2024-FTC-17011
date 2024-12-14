@@ -56,7 +56,7 @@ public class HighBasketAuto extends OpMode {
     public static final Point startPoint = new Point (startingPoseLeft.getX(), startingPoseLeft.getY(), Point.CARTESIAN); // <-- insert correct points     public static final Point startPoint = new Point (startingPoseLeft.getX(), startingPoseLeft.getY(), Point.CARTESIAN);
     public static final Pose basketScorePos = pointAndHeadingToPose(-54.3, -54.057, 45.25);
     public static final Pose firstSpikePos = pointAndHeadingToPose(-50.6101, -51.53, 91.3263); //This is the rightmost spike, and insert correct points
-    public static final Pose secondSpikePos = pointAndHeadingToPose(-59, -51.53, 93);
+    public static final Pose secondSpikePos = pointAndHeadingToPose(-58, -51.53, 91);
     public static final Pose thirdSpikePos = pointAndHeadingToPose(-59, -49.53, 116.5);
 
 
