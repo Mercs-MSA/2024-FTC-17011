@@ -214,6 +214,7 @@ public class TeleOp17011 extends LinearOpMode {
         }
 
         if (gamepad2.right_stick_y > .1) {
+            slides.slideSetPos(-1500);
             pivot.setPow(-1);
         }
 
@@ -378,7 +379,7 @@ public class TeleOp17011 extends LinearOpMode {
                         pivot.setPow(0);
                     }
                 } else if (pivot.getPos() > 20 && pivotBool) {
-                    pivot.setPow(.35);
+                    pivot.setPow(.3);
                 }
 
                 if (pivotBool && slides.getLeftPos() > extendPos && pivot.getPos() < pivotDownPos) {

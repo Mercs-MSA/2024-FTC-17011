@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
+import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
 import org.firstinspires.ftc.teamcode.subSystems.Intakes;
 import org.firstinspires.ftc.teamcode.subSystems.Pivot;
 import org.firstinspires.ftc.teamcode.subSystems.Slides;
@@ -24,6 +25,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstan
 @Autonomous
 public class HighBasketAuto extends OpMode {
     private Telemetry telemetryA;
+    private FollowerConstants followerConstants;
 
     private Constants constants;
     private Follower follower;
@@ -52,10 +54,10 @@ public class HighBasketAuto extends OpMode {
     private int timeoutPeriod = 0;
     //------------------------------------------------------------------------------------------------------------------------
     public static final Point startPoint = new Point (startingPoseLeft.getX(), startingPoseLeft.getY(), Point.CARTESIAN); // <-- insert correct points     public static final Point startPoint = new Point (startingPoseLeft.getX(), startingPoseLeft.getY(), Point.CARTESIAN);
-    public static final Pose basketScorePos = pointAndHeadingToPose(-56.49, -55.757, 45.25);
-    public static final Pose firstSpikePos = pointAndHeadingToPose(-50.6101, -52.03, 90.3263); //This is the rightmost spike, and insert correct points
-    public static final Pose secondSpikePos = pointAndHeadingToPose(0, -53.03, 90);
-    public static final Pose thirdSpikePos = pointAndHeadingToPose(0, -53.03, 90);
+    public static final Pose basketScorePos = pointAndHeadingToPose(-54.3, -54.057, 45.25);
+    public static final Pose firstSpikePos = pointAndHeadingToPose(-50.6101, -51.53, 91.3263); //This is the rightmost spike, and insert correct points
+    public static final Pose secondSpikePos = pointAndHeadingToPose(-59, -51.53, 93);
+    public static final Pose thirdSpikePos = pointAndHeadingToPose(-59, -49.53, 116.5);
 
 
 
@@ -70,7 +72,8 @@ public class HighBasketAuto extends OpMode {
             throw new RuntimeException(e);
         }
         currentState = AUTO_STATE.START_STATE;
-        follower.setMaxPower(.6);
+        follower.setMaxPower(.75);
+        followerConstants.pathEndTimeoutConstraint = 200;
 
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -115,22 +118,33 @@ public class HighBasketAuto extends OpMode {
         return returnPoint;
     }
     public void processStartState() {
+        intakes.pivotSetPos(constants.intakePivotMidPos);
+        intakes.specSetPos(constants.specimenScorePos);
         makePath(basketScorePos);
         currentState = AUTO_STATE.PATH_ACTIVE;
         primerState = AUTO_STATE.SCORE_BASKET;
     }
 
     int counter = 0;
+    int bonusCount = 23;
     public void processScoreState() {
+        if (pivot.getPos() < constants.pivotUpPos - 10) {
+            slides.setPow(1);
+            pivot.setPow(.6);
+        }
         pivot.pivotSetPos(constants.pivotUpPos);
-        if (pivot.getPos() > (constants.pivotUpPos - 250)) {
+        if (pivot.getPos() > (constants.pivotUpPos - 50)) {
+            pivot.setPow(0);
             slides.slideSetPos(constants.highBasketPos);
             if (slides.getLeftPos() > (constants.highBasketPos - 50)) {
                 intakes.pivotSetPos(constants.intakePivotScorePos);
-                if (counter < 30) {
+                if (counter < 22) {
+                    bonusCount--;
+                    if (bonusCount < 12) {
+                    intakes.setIntakePower(constants.intakeScorePow);
+                    }
                     counter++;
                 } else {
-                    intakes.setIntakePower(constants.intakeScorePow);
                     currentState = AUTO_STATE.MECHANISMS_RESET;
                 }
             }
@@ -140,12 +154,16 @@ public class HighBasketAuto extends OpMode {
     public void processResetMechanisms() {
         counter = 0;
         counter2 = 0;
+        bonusCount = 22;
+        if (pivot.getPos() > 30)
+            pivot.setPow(.3);
         intakes.setIntakePower(0);
         intakes.pivotSetPos(constants.intakePivotMidPos);
         slides.slideSetPos(0);
-        if (slides.getLeftPos() < 200) {
+        if (slides.getLeftPos() < 1900) {
             pivot.pivotSetPos(-60);
-            if (pivot.getPos() < 0) {
+            if (pivot.getPos() < 15) {
+                pivot.setPow(0);
                 pivot.resetPos();
                 if (samplesAcquired == 0 && !lastStatePickUp)
                     currentState = AUTO_STATE.GO_TO_FIRST_SPIKE;
@@ -174,6 +192,7 @@ public class HighBasketAuto extends OpMode {
     }
 
     public void processThirdSpike() {
+        intakes.pivotSetPos(constants.intakeSpinRight - .125);
         makePath(thirdSpikePos);
         currentState = AUTO_STATE.PATH_ACTIVE;
         primerState = AUTO_STATE.PICKUP_SPIKE;
@@ -187,8 +206,8 @@ public class HighBasketAuto extends OpMode {
         intakes.setIntakePower(constants.intakeCollectPow);
         intakes.pivotSetPos(constants.intakePivotGrabPos);
         if (Math.abs(slides.getPow() - 1) < .5)
-            slides.setPow(.5);
-        if (counter2 < 50) {
+            slides.setPow(.8);
+        if (counter2 < 43) {
             slides.slideSetPos(extendPosAuto);
             counter2++;
         } else {

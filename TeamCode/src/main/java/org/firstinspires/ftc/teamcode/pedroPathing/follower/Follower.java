@@ -169,10 +169,10 @@ public class Follower {
         rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
 
         // TODO: Make sure that this is the direction your motors need to be reversed in.
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE); //V2 - Forward
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE); //V2 - Forward
+        rightRear.setDirection(DcMotorSimple.Direction.FORWARD); //V2 - Reverse
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD); //V2 - Reverse
 
         motors = Arrays.asList(leftFront, leftRear, rightFront, rightRear);
 

@@ -67,12 +67,12 @@ public class PedroSpecimenAuto extends OpMode {
     public static final Pose firstStaging = pointAndHeadingToPose(-11.25, 40, 90);
     public static final Pose secondStaging = pointAndHeadingToPose(-35.14,42.23,90);
     public static final Pose thirdStaging = pointAndHeadingToPose(-37,16.58,90);
-    public static final Pose firstPush = pointAndHeadingToPose(-57,16.58,90);
+    public static final Pose firstPush = pointAndHeadingToPose(-55,16.58,90);
     public static final Pose toObs = pointAndHeadingToPose(-50.5,53,90);
     public static final Pose secondPush = pointAndHeadingToPose(-65,17.33,90);
     public static final Pose backToObs = pointAndHeadingToPose(-64,59.52,90);
     public static final Pose toIntake = pointAndHeadingToPose(-35.33, 42, 270);
-    public static final Pose finalIntakePoint = pointAndHeadingToPose(-32.75,61.7,270);
+    public static final Pose finalIntakePoint = pointAndHeadingToPose(-32.75,62.7,270);
     
     public static final Pose specScoreSecondPose = pointAndHeadingToPose(-3.25, 37.25, 89);
     public static final Pose specScoreThirdPose = pointAndHeadingToPose(-8.25, 37.55, 89);
@@ -94,7 +94,6 @@ public class PedroSpecimenAuto extends OpMode {
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         telemetryA.update();
-//        pivot.setPow(1);
     }
 
     public static Pose pointAndHeadingToPose(double x, double y, double headingInDegrees) {
@@ -204,12 +203,12 @@ public class PedroSpecimenAuto extends OpMode {
 //    boolean up = false;
     private void processStaging() {
 //        if (up) {
-            pivot.pivotSetPos(constants.pivotUpPos);
+        pivot.pivotSetPos(constants.pivotUpPos);
 //            up = false;
 //        }
 //        pivot.normalMode();
 //        pivot.setPow(1);
-        if (Math.abs(pivot.getPos() - Constants.pivotUpPos) < 275) {
+        if (Math.abs(pivot.getPos() - Constants.pivotUpPos) < 65) {
             slides.slideSetPos(Constants.highSpecimenPos);
             if (Math.abs(slides.getLeftPos() - Constants.highSpecimenPos) < 50) {
                 makePath(specScorePose);
@@ -322,6 +321,8 @@ public class PedroSpecimenAuto extends OpMode {
     
     public void processBackToIntake() {
         follower.setMaxPower(.6);
+        if (specCount == 1)
+            follower.setMaxPower(.45);
         Path segmentEight = new Path(new BezierCurve(poseToPoint(follower.getPose()), poseToPoint(toIntake)));
         segmentEight.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(270), 1);
         Path segmentNine = new Path(new BezierCurve(poseToPoint(toIntake), poseToPoint(finalIntakePoint)));
@@ -387,6 +388,7 @@ public class PedroSpecimenAuto extends OpMode {
             pivot.setPow(-1);
         }
 
+        telemetry.addData("follower busy?: ", follower.isBusy());
         telemetry.addData("pivot pos: ", pivot.getPos());
         telemetry.addData("current state: ", currentState);
         telemetry.addData("left pos: ", Math.abs(slides.getLeftPos()));
