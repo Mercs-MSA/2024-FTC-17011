@@ -129,7 +129,7 @@ public class HighBasketAuto extends OpMode {
     int bonusCount = 23;
     public void processScoreState() {
         if (pivot.getPos() < constants.pivotUpPos - 10) {
-            slides.setPow(1);
+            slides.setPow(.95);
             pivot.setPow(.6);
         }
         pivot.pivotSetPos(constants.pivotUpPos);
@@ -140,17 +140,19 @@ public class HighBasketAuto extends OpMode {
                 intakes.pivotSetPos(constants.intakePivotScorePos);
                 if (counter < 22) {
                     bonusCount--;
-                    if (bonusCount < 12) {
+                    if (bonusCount < 13) {
                     intakes.setIntakePower(constants.intakeScorePow);
                     }
                     counter++;
                 } else {
+                    counterForPivot = 10;
                     currentState = AUTO_STATE.MECHANISMS_RESET;
                 }
             }
         }
     }
 
+    int counterForPivot = 10;
     public void processResetMechanisms() {
         counter = 0;
         counter2 = 0;
@@ -159,8 +161,11 @@ public class HighBasketAuto extends OpMode {
             pivot.setPow(.3);
         intakes.setIntakePower(0);
         intakes.pivotSetPos(constants.intakePivotMidPos);
-        slides.slideSetPos(0);
-        if (slides.getLeftPos() < 1900) {
+        counterForPivot--;
+        if (counterForPivot < 0) {
+            slides.slideSetPos(0);
+        }
+        if (slides.getLeftPos() < 2000) {
             pivot.pivotSetPos(-60);
             if (pivot.getPos() < 15) {
                 pivot.setPow(0);
@@ -169,9 +174,10 @@ public class HighBasketAuto extends OpMode {
                     currentState = AUTO_STATE.GO_TO_FIRST_SPIKE;
                 else if (samplesAcquired == 1 && !lastStatePickUp)
                     currentState = AUTO_STATE.GO_TO_SECOND_SPIKE;
-                else if (samplesAcquired == 2 && !lastStatePickUp)
+                else if (samplesAcquired == 2 && !lastStatePickUp) {
+                    counter2 = 4;
                     currentState = AUTO_STATE.GO_TO_THIRD_SPIKE;
-                else if (lastStatePickUp) {
+                } else if (lastStatePickUp) {
                     lastStatePickUp = false;
                     currentState = AUTO_STATE.PATH_TO_BASKET_READY;
                 }
@@ -249,6 +255,8 @@ public class HighBasketAuto extends OpMode {
         processStateMachine();
 
         follower.update();
+        telemetry.addData("intake right power: ", intakes.getRightPower());
+        telemetry.addData("intake left power: ", intakes.getLeftPower());
         telemetry.addData("counter: ", counter);
         telemetry.addData("samples acquired: ", samplesAcquired);
         telemetry.addData("pivot pos: ", pivot.getPos());

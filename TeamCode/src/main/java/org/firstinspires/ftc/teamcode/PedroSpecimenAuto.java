@@ -72,7 +72,7 @@ public class PedroSpecimenAuto extends OpMode {
     public static final Pose secondPush = pointAndHeadingToPose(-65,17.33,90);
     public static final Pose backToObs = pointAndHeadingToPose(-64,59.52,90);
     public static final Pose toIntake = pointAndHeadingToPose(-35.33, 42, 270);
-    public static final Pose finalIntakePoint = pointAndHeadingToPose(-32.75,62.7,270);
+    public static final Pose finalIntakePoint = pointAndHeadingToPose(-33.5,62.7,270);
     
     public static final Pose specScoreSecondPose = pointAndHeadingToPose(-3.25, 37.25, 89);
     public static final Pose specScoreThirdPose = pointAndHeadingToPose(-8.25, 37.55, 89);

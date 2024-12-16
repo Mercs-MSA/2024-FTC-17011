@@ -62,4 +62,11 @@ public class Intakes {
     public double specCheckPos() {
         return specimenIntake.getPosition();
     }
+
+    public double getRightPower() {
+        return intakeRight.getPower();
+    }
+    public double getLeftPower() {
+        return intakeLeft.getPower();
+    }
 }
