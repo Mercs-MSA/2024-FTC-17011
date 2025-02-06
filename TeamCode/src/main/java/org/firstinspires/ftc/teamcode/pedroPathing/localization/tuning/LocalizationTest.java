@@ -47,7 +47,7 @@ public class LocalizationTest extends OpMode {
     private DcMotorEx rightRear;
     private List<DcMotorEx> motors;
 
-    private Pose newPose = new Pose(-11.25, 35.95, Math.toRadians(90));
+    private Pose newPose = new Pose(-11.25, 35.95, Math.toRadians(360));
     /**
      * This initializes the PoseUpdater, the mecanum drive motors, and the FTC Dashboard telemetry.
      */

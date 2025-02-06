@@ -22,7 +22,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.util.KalmanFilterParameters;
  */
 @Config
 public class FollowerConstants {
-    public static Pose startingPoseLeft = new Pose(-41.88, -64.72, Math.toRadians(90));
+    public static Pose startingPoseLeft = new Pose(-41.88, -64.72, Math.toRadians(90));//360
+
     public static Pose startingPoseRight = new Pose(-11.25, 63, Math.toRadians(90));
 
     // This section is for configuring your motors

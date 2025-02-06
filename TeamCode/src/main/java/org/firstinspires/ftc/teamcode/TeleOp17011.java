@@ -121,10 +121,10 @@ public class TeleOp17011 extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRight");
         rightBackDrive = hardwareMap.get(DcMotor.class, "backRight");
 
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - REVERSE //V2 - FORWARD
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - REVERSE //V2 - FORWARD
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - FORWARD //V2 - REVERSE
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - FORWARD //V2 - REVERSE
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE //V2 - FORWARD
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE //V2 - FORWARD
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - FORWARD //V2 - REVERSE
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - FORWARD //V2 - REVERSE
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
