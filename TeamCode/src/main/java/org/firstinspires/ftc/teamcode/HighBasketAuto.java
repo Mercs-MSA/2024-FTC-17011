@@ -54,11 +54,15 @@ public class HighBasketAuto extends OpMode {
     private int timeoutPeriod = 0;
     //------------------------------------------------------------------------------------------------------------------------
     public static final Point startPoint = new Point (startingPoseLeft.getX(), startingPoseLeft.getY(), Point.CARTESIAN); // <-- insert correct points     public static final Point startPoint = new Point (startingPoseLeft.getX(), startingPoseLeft.getY(), Point.CARTESIAN);
-    public static final Pose basketScorePos = pointAndHeadingToPose(-54.3, -54.057, 45.25);
-    public static final Pose firstSpikePos = pointAndHeadingToPose(-50.6101, -51.53, 91.3263); //This is the rightmost spike, and insert correct points
-    public static final Pose secondSpikePos = pointAndHeadingToPose(-58, -51.53, 91);
-    public static final Pose thirdSpikePos = pointAndHeadingToPose(-59, -49.53, 116.5);
+//    public static final Pose basketScorePos = pointAndHeadingToPose(-52, -55.4, 49.25);
+//    public static final Pose firstSpikePos = pointAndHeadingToPose(-50.6101, -51.53, 91.3263); //This is the rightmost spike, and insert correct points
+//    public static final Pose secondSpikePos = pointAndHeadingToPose(-58, -51.53, 93);
+//    public static final Pose thirdSpikePos = pointAndHeadingToPose(-59, -49.53, 110.5);
 
+    public static final Pose basketScorePos = pointAndHeadingToPose(-53.0773, -57.212, 46.2469);
+    public static final Pose firstSpikePos = pointAndHeadingToPose(-49.5214, -47.336, 90); //This is the rightmost spike, and insert correct points
+    public static final Pose secondSpikePos = pointAndHeadingToPose(-57.8116, -42.1442, 93);
+    public static final Pose thirdSpikePos = pointAndHeadingToPose(-55.661, -38.4556, 110.5);
 
 
     @Override
@@ -72,8 +76,8 @@ public class HighBasketAuto extends OpMode {
             throw new RuntimeException(e);
         }
         currentState = AUTO_STATE.START_STATE;
-        follower.setMaxPower(.75);
-        followerConstants.pathEndTimeoutConstraint = 200;
+        follower.setMaxPower(.8);
+        followerConstants.pathEndTimeoutConstraint = 400;
 
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -129,8 +133,8 @@ public class HighBasketAuto extends OpMode {
     int bonusCount = 23;
     public void processScoreState() {
         if (pivot.getPos() < constants.pivotUpPos - 10) {
-            slides.setPow(.95);
-            pivot.setPow(.6);
+            slides.setPow(1);
+            pivot.setPow(.7);
         }
         pivot.pivotSetPos(constants.pivotUpPos);
         if (pivot.getPos() > (constants.pivotUpPos - 50)) {
@@ -140,33 +144,29 @@ public class HighBasketAuto extends OpMode {
                 intakes.pivotSetPos(constants.intakePivotScorePos);
                 if (counter < 22) {
                     bonusCount--;
-                    if (bonusCount < 13) {
-                    intakes.setIntakePower(constants.intakeScorePow);
+                    if (bonusCount < 12) {
+                        intakes.setIntakePower(constants.intakeScorePow);
                     }
                     counter++;
                 } else {
-                    counterForPivot = 10;
                     currentState = AUTO_STATE.MECHANISMS_RESET;
                 }
             }
         }
     }
 
-    int counterForPivot = 10;
     public void processResetMechanisms() {
         counter = 0;
         counter2 = 0;
         bonusCount = 22;
         if (pivot.getPos() > 30)
-            pivot.setPow(.3);
+            pivot.setPow(.35);
         intakes.setIntakePower(0);
         intakes.pivotSetPos(constants.intakePivotMidPos);
-        counterForPivot--;
-        if (counterForPivot < 0) {
-            slides.slideSetPos(0);
-        }
-        if (slides.getLeftPos() < 2000) {
+        slides.slideSetPos(0);
+        if (slides.getLeftPos() < 1900) {
             pivot.pivotSetPos(-60);
+            intakes.spinSetPos(constants.intakeSpinDefault);
             if (pivot.getPos() < 15) {
                 pivot.setPow(0);
                 pivot.resetPos();
@@ -174,10 +174,9 @@ public class HighBasketAuto extends OpMode {
                     currentState = AUTO_STATE.GO_TO_FIRST_SPIKE;
                 else if (samplesAcquired == 1 && !lastStatePickUp)
                     currentState = AUTO_STATE.GO_TO_SECOND_SPIKE;
-                else if (samplesAcquired == 2 && !lastStatePickUp) {
-                    counter2 = 4;
+                else if (samplesAcquired == 2 && !lastStatePickUp)
                     currentState = AUTO_STATE.GO_TO_THIRD_SPIKE;
-                } else if (lastStatePickUp) {
+                else if (lastStatePickUp) {
                     lastStatePickUp = false;
                     currentState = AUTO_STATE.PATH_TO_BASKET_READY;
                 }
@@ -212,8 +211,8 @@ public class HighBasketAuto extends OpMode {
         intakes.setIntakePower(constants.intakeCollectPow);
         intakes.pivotSetPos(constants.intakePivotGrabPos);
         if (Math.abs(slides.getPow() - 1) < .5)
-            slides.setPow(.8);
-        if (counter2 < 43) {
+            slides.setPow(.9);
+        if (counter2 < 46) {
             slides.slideSetPos(extendPosAuto);
             counter2++;
         } else {
@@ -223,7 +222,7 @@ public class HighBasketAuto extends OpMode {
     }
 
     public void processGoToBasket() {
-        makePath(basketScorePos);
+        makePath(new Pose(basketScorePos.getX() + 1, basketScorePos.getY() + 1, basketScorePos.getHeading()));
         currentState = AUTO_STATE.PATH_ACTIVE;
         primerState = AUTO_STATE.SCORE_BASKET;
     }
@@ -255,8 +254,6 @@ public class HighBasketAuto extends OpMode {
         processStateMachine();
 
         follower.update();
-        telemetry.addData("intake right power: ", intakes.getRightPower());
-        telemetry.addData("intake left power: ", intakes.getLeftPower());
         telemetry.addData("counter: ", counter);
         telemetry.addData("samples acquired: ", samplesAcquired);
         telemetry.addData("pivot pos: ", pivot.getPos());

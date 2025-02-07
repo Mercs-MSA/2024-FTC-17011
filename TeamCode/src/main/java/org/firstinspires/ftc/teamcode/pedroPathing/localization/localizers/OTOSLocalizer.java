@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.localization.localizers;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -38,7 +37,6 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
  * @author Anyi Lin - 10158 Scott's Bots
  * @version 1.0, 7/20/2024
  */
-@Config
 public class OTOSLocalizer extends Localizer {
     private HardwareMap hardwareMap;
     private Pose startPose;
@@ -48,7 +46,6 @@ public class OTOSLocalizer extends Localizer {
     private SparkFunOTOS.Pose2D otosAcc;
     private double previousHeading;
     private double totalHeading;
-    public static int angle = 0;
 
     /**
      * This creates a new OTOSLocalizer from a HardwareMap, with a starting Pose at (0,0)
@@ -85,11 +82,11 @@ public class OTOSLocalizer extends Localizer {
         // For the OTOS, left/right is the y axis and forward/backward is the x axis, with left being
         // positive y and forward being positive x. PI/2 radians is facing forward, and clockwise
         // rotation is negative rotation.
-        otos.setOffset(new SparkFunOTOS.Pose2D(1.4375,-5.875,Math.toRadians(angle)));
+        otos.setOffset(new SparkFunOTOS.Pose2D(1.4375,-5.875,Math.toRadians(0)));
 
         // TODO: replace these with your tuned multipliers
-        otos.setLinearScalar(1.0107);
-        otos.setAngularScalar(.9844);
+        otos.setLinearScalar(.9962);
+        otos.setAngularScalar(.9824);
 
         otos.calibrateImu();
         otos.resetTracking();

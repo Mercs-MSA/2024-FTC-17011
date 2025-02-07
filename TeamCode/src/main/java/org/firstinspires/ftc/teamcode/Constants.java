@@ -9,10 +9,10 @@ public class Constants {
 
     //Mechanism Numbers!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public final static double intakePivotScorePos = 0.3; //V2 = 0
-    public final static double intakePivotMidPos = .6; //V2 = .3
+    public final static double intakePivotMidPos = .42; //V2 = .3
     public final static double intakePivotGrabPos = 0.98; //V1 = .55; V2 = .64
-//    public final static double intakeScorePos = .25;
-//    public final static double intakeHoldPos = 0;
+    public final static double intakeScorePos = .25;
+    public final static double intakeHoldPos = 0;
     public final static double intakeScorePow = 1;
     public final static double intakeCollectPow = -1;
 
