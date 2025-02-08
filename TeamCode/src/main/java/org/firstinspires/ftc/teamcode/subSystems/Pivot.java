@@ -59,7 +59,9 @@ public class Pivot {
     public int getPos() {
         return leftPivot.getCurrentPosition();
     }
-    public double getPow() {return leftPivot.getPower();}
+    public double getLeftPow() {return leftPivot.getPower();}
+    public double getRightPow() {return rightPivot.getPower();}
+
 
     public void resetPos() {
         leftPivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

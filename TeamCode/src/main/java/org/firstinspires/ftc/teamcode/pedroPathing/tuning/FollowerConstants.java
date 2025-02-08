@@ -22,9 +22,11 @@ import org.firstinspires.ftc.teamcode.pedroPathing.util.KalmanFilterParameters;
  */
 @Config
 public class FollowerConstants {
-    public static Pose startingPoseLeft = new Pose(-41.88, -64.72, Math.toRadians(90));//360
+    public static Pose startingPoseLeft = new Pose(-41.88, -64.72, Math.toRadians(90));
 
     public static Pose startingPoseRight = new Pose(-11.25, 63, Math.toRadians(90));
+
+    public static Pose startingPoseFourSpec = new Pose(21, 63.75, Math.toRadians(90));
 
     // This section is for configuring your motors
     public static String leftFrontMotorName = "frontLeft";
@@ -134,7 +136,7 @@ public class FollowerConstants {
     // When the Path is considered at its end parametrically, then the Follower has this many
     // milliseconds to further correct by default.
     // This can be custom set for each Path.
-    public static double pathEndTimeoutConstraint = 150;
+    public static double pathEndTimeoutConstraint = 250;
 
     // This is how many steps the BezierCurve class uses to approximate the length of a BezierCurve.
     public static int APPROXIMATION_STEPS = 1000;

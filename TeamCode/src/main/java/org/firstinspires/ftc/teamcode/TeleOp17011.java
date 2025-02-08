@@ -103,6 +103,8 @@ public class TeleOp17011 extends LinearOpMode {
     private boolean climbTrue = false;
     private boolean encoderTrue = true;
     FtcDashboard dash;
+    private double operatorRightStick = 0;
+    private double operatorLeftStick = 0;
 
     private void initializeImu() {
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
@@ -121,10 +123,10 @@ public class TeleOp17011 extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRight");
         rightBackDrive = hardwareMap.get(DcMotor.class, "backRight");
 
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - REVERSE //V2 - FORWARD
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - REVERSE //V2 - FORWARD
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - FORWARD //V2 - REVERSE
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - FORWARD //V2 - REVERSE
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE //V2 - FORWARD
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE //V2 - FORWARD
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - FORWARD //V2 - REVERSE
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE); //V1 - FORWARD //V2 - REVERSE
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -149,9 +151,9 @@ public class TeleOp17011 extends LinearOpMode {
         if (gamepad2.dpad_up) {
             if (!pivotBool) {
                 slides.slideSetPos(highBasketPos);
+                intakes.pivotSetPos(intakePivotMidPos);
             } else if (pivotBool) {
                 slides.slideSetPos(extendPos);
-                intakes.pivotSetPos(intakePivotMidPos);
             }
         }
         if (gamepad2.dpad_left && pivotBool) {
@@ -164,7 +166,6 @@ public class TeleOp17011 extends LinearOpMode {
                 intakes.pivotSetPos(intakePivotGrabPos);
                 slides.slideSetPos(highSpecimenPos);
             } else if (pivotBool) {
-                intakes.pivotSetPos(intakePivotMidPos);
                 slides.slideSetPos(extendPos);
             }
         } else if (gamepad2.right_bumper) {
@@ -172,7 +173,6 @@ public class TeleOp17011 extends LinearOpMode {
                 intakes.specSetPos(specimenHoldPos);
                 slides.slideSetPos(highSpecScorePos);
             } else if (pivotBool) {
-                intakes.pivotSetPos(intakePivotMidPos);
                 slides.slideSetPos(extendPos);
             }
         }
@@ -190,11 +190,11 @@ public class TeleOp17011 extends LinearOpMode {
 
         //Lift Down
         if (gamepad2.dpad_down) {
-            intakes.pivotSetPos(intakePivotMidPos);
             slides.slideSetPos(0);
+        } else if (gamepad2.cross) {
             pivotBool = true;
             pivot.pivotSetPos(pivotDownPos);
-        } else if (gamepad2.x) { // Lift up
+        }else if (gamepad2.triangle) { // Lift up
             pivotBool = false;
             pivot.pivotSetPos(pivotUpPos);
         }
@@ -213,14 +213,17 @@ public class TeleOp17011 extends LinearOpMode {
             }
         }
 
-        if (gamepad2.right_stick_y > .1) {
+        if (gamepad2.right_stick_y > .1 && !encoderTrue) {
             slides.slideSetPos(-1500);
             pivot.setPow(-1);
         }
 
 
-        if (Math.abs(gamepad2.left_stick_y) > .3) {
-            slides.slideSetPos(slides.getLeftPos() + ((int) (-gamepad2.left_stick_y * 70)));
+        if (Math.abs(gamepad2.left_stick_y) > .1) {
+//            slides.slideSetPos(slides.getLeftPos() + ((int) (-gamepad2.left_stick_y * 70)));
+//            operatorLeftStick = -gamepad2.left_stick_y;
+//            pivot.setPow(operatorLeftStick);
+//            pivot.pivotSetPos(pivot.getPos() + (int)(operatorLeftStick * 20));
         }
 
 //        if (gamepad1.triangle && pivotBool) {
@@ -263,13 +266,19 @@ public class TeleOp17011 extends LinearOpMode {
             intakes.spinSetPos(intakeSpinDefault);
         }
 
-        if (gamepad2.y) {
-            intPivotControl = false;
-            intakes.pivotSetPos(intakePivotScorePos);
-        } else if (gamepad2.a) {
-            intPivotControl = true;
-            intakes.pivotSetPos(intakePivotGrabPos);
-        } else if (gamepad2.b) {
+        operatorRightStick = gamepad2.right_stick_y;
+        if (Math.abs(gamepad2.right_stick_y) > .1) {
+            intakes.pivotSetPos(intakes.pivotGetPos() + .1 * operatorRightStick);
+        }
+
+//        if (gamepad2.y) {
+//            intPivotControl = false;
+//            intakes.pivotSetPos(intakePivotScorePos);
+//        }
+//        } else if (gamepad2.a) {
+//            intPivotControl = true;
+//            intakes.pivotSetPos(intakePivotGrabPos);
+        if (gamepad2.circle) {
             intPivotControl = false;
             intakes.pivotSetPos(intakePivotMidPos);
         }
@@ -387,9 +396,9 @@ public class TeleOp17011 extends LinearOpMode {
                 }
             }
 
-            if (intPivotControl) {
-                intakes.pivotSetPos(intakePivotGrabPos);
-            }
+//            if (intPivotControl) {
+//                intakes.pivotSetPos(intakePivotGrabPos);
+//            }
 
 //            if (slideReadyBool && mechanismState == highBasketState) {
 //                leftSlide.setTargetPosition((int) (31 * slideTickPerIn));
@@ -412,8 +421,13 @@ public class TeleOp17011 extends LinearOpMode {
             } else {
                 telemetry.addLine("Pivot is up/going up");
             }
-            telemetry.addData("Pivot power: ", pivot.getPow());
-//            telemetry.addData("Current velocity:", rightBackDrive.getVelocity());
+            telemetry.addData("Left Pivot power: ", pivot.getLeftPow());
+            telemetry.addData("Right Pivot power: ", pivot.getRightPow());
+            telemetry.addData("Left Slide power: ", slides.getLeftPow());
+            telemetry.addData("Left Slide power: ", slides.getRightPow());
+
+
+            //            telemetry.addData("Current velocity:", rightBackDrive.getVelocity());
 //            telemetry.addData("Current power:", (rightBackDrive.getPower()*2500));
 //            telemetry.addData("PID Values:", pidNew);
 //            telemetry.addData("Old pidOrig:", pidOrig2);

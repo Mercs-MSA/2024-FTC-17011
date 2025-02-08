@@ -54,6 +54,8 @@ public class Intakes {
         intakePivot.setPosition(pos);
     }
 
+    public double pivotGetPos() {return intakePivot.getPosition();}
+
 //    public double clawGetPos() { return intake.getPosition(); } V1
 
     public void specSetPos(double pos) {

@@ -4,13 +4,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.subSystems.Pivot;
+
 @TeleOp
 public class DriveTester extends LinearOpMode {
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-//    private DcMotor pivot = null;
+    private Pivot pivot;
+    private Constants constants;
+
     @Override
     public void runOpMode() throws InterruptedException {
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -28,8 +32,8 @@ public class DriveTester extends LinearOpMode {
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        pivot = hardwareMap.get(DcMotor.class, "pivot");
-//        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pivot = new Pivot(hardwareMap, constants.pivotP, constants.pivotI, constants.pivotD, constants.pivotF);
+        pivot.setPow(.8);
 
         waitForStart();
         while (opModeIsActive()) {
@@ -50,13 +54,13 @@ public class DriveTester extends LinearOpMode {
                 rightBackDrive.setPower(-gamepad1.left_stick_y);
             }
 
-//            if (gamepad2.triangle) {
-//                pivot.setPower(1);
-//            } else if (gamepad2.cross) {
-//                pivot.setPower(-.5);
-//            } else if (gamepad2.circle) {
-//                pivot.setPower(0);
-//            }
+            if (gamepad2.triangle) {
+                pivot.setPow(.8);
+                pivot.pivotSetPos(constants.pivotUpPos);
+            } else if (gamepad2.cross) {
+                pivot.setPow(.3);
+                pivot.pivotSetPos(constants.pivotDownPos);
+            }
 
             telemetry.addData("Left Front Power: ", leftFrontDrive.getPower());
             telemetry.addData("Right Front Power: ", rightFrontDrive.getPower());

@@ -224,7 +224,7 @@ public class PedroSpecimenAuto extends OpMode {
     private void processSpecScore() {
         if (intakes.specCheckPos() != constants.specimenScorePos)
             slides.slideSetPos(constants.highSpecScorePos);
-        if (pivot.getPow() == 1)
+        if (pivot.getLeftPow() == 1)
             pivot.setPow(0);
         if (Math.abs(slides.getLeftPos() - constants.highSpecScorePos) < 15) {
             intakes.specSetPos(constants.specimenScorePos);

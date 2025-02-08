@@ -248,51 +248,10 @@ public class FourSpecAuto extends OpMode {
         primerState = AUTO_STATE.COLLECT_STATE;
     }
 
-    private void processSpecScore() {
-        if (intakes.specCheckPos() != constants.specimenScorePos)
-            slides.slideSetPos(constants.highSpecScorePos);
-        if (pivot.getPow() == 1)
-            pivot.setPow(0);
-        if (Math.abs(slides.getLeftPos() - constants.highSpecScorePos) < 15) {
-            intakes.specSetPos(constants.specimenScorePos);
-            slides.slideSetPos(0);
-            if (specCount == 0) {
-                currentState = AUTO_STATE.DO_NOTHING_STATE;
-            } else if (specCount == 1) {
-                currentState = AUTO_STATE.BACK_TO_INTAKE;
-            } else if (specCount >= 2) {
-                currentState = AUTO_STATE.PARK_STATE;
-            }
-        }
-    }
-
-    int specCount = 0;
-    int counter = 0;
-    int counter2 = 0;
-    private void processIntake() {
-        if (counter2 == 0) {
-            counter = 0;
-            counter2++;
-        }
-        if (counter < 40) {
-            follower.setMaxPower(.8);
-            intakes.specSetPos(constants.specimenHoldPos);
-            counter++;
-        }
-        if (counter >= 39) {
-            specCount++;
-            counter2 = 0;
-            slides.slideSetPos(constants.highSpecimenPos);
-            if (specCount == 1) {
-                makePath(specScoreSecondPose);
-                currentState = AUTO_STATE.PATH_ACTIVE;
-                primerState = AUTO_STATE.SPEC_SCORE_STATE;
-            } else if (specCount > 2 ) {
-                makePath(specScoreThirdPose);
-                currentState = AUTO_STATE.PATH_ACTIVE;
-                primerState = AUTO_STATE.SPEC_SCORE_STATE;
-            }
-        }
+    private void processPivotUp() {
+        slides.slideSetPos(0);
+        pivot.pivotSetPos(constants.pivotUpPos);
+        currentState = AUTO_STATE.BACK_TO_INTAKE;
     }
 
     private void processBackToIntake() {
@@ -307,6 +266,63 @@ public class FourSpecAuto extends OpMode {
         follower.followPath(secondCurve, true);
         currentState = AUTO_STATE.PATH_ACTIVE;
         primerState = AUTO_STATE.INTAKE_STATE;
+    }
+
+    int specCount = 0;
+    int counter = 0;
+    int counter2 = 0;
+    private void processIntake() {
+        if (counter2 == 0) {
+            counter = 0;
+            counter2++;
+        }
+        if (counter < 30) {
+            follower.setMaxPower(.8);
+            intakes.specSetPos(constants.specimenHoldPos);
+            counter++;
+        }
+        if (counter >= 29) {
+            specCount++;
+            counter2 = 0;
+            slides.slideSetPos(constants.highSpecimenPos);
+            if (specCount == 1) {
+                makePath(specScoreFirstPose);
+                currentState = AUTO_STATE.PATH_ACTIVE;
+                primerState = AUTO_STATE.SPEC_SCORE_STATE;
+            } else if (specCount == 2 ) {
+                makePath(specScoreSecondPose);
+                currentState = AUTO_STATE.PATH_ACTIVE;
+                primerState = AUTO_STATE.SPEC_SCORE_STATE;
+            } else if (specCount == 3) {
+                makePath(specScoreThirdPose);
+                currentState = AUTO_STATE.PATH_ACTIVE;
+                primerState = AUTO_STATE.SPEC_SCORE_STATE;
+            } else if (specCount == 4) {
+                makePath(specScoreFourthPose);
+                currentState = AUTO_STATE.PATH_ACTIVE;
+                primerState = AUTO_STATE.SPEC_SCORE_STATE;
+            }
+        }
+    }
+
+    private void processSpecScore() {
+        if (intakes.specCheckPos() != constants.specimenScorePos)
+            slides.slideSetPos(constants.highSpecScorePos);
+        if (pivot.getLeftPow() == 1)
+            pivot.setPow(0);
+        if (Math.abs(slides.getLeftPos() - constants.highSpecScorePos) < 15) {
+            intakes.specSetPos(constants.specimenScorePos);
+            slides.slideSetPos(0);
+            if (specCount == 1) {
+                currentState = AUTO_STATE.BACK_TO_INTAKE;
+            } else if (specCount == 2) {
+                currentState = AUTO_STATE.BACK_TO_INTAKE;
+            } else if (specCount == 3) {
+                currentState = AUTO_STATE.BACK_TO_INTAKE;
+            } else if (specCount == 4) {
+                currentState = AUTO_STATE.PATH_ACTIVE;
+            }
+        }
     }
 
     private void processPark() {
@@ -327,7 +343,7 @@ public class FourSpecAuto extends OpMode {
             case TURN_TO_DROP_OFF: processTurnToDropOff(); break;
             case DROP_OFF_STATE: processDropOff(); break;
             case SPIKE_TWO_STATE: processSpikeTwo(); break;
-            case PIVOT_UP:
+            case PIVOT_UP: processPivotUp(); break;
             case INTAKE_STATE: processIntake(); break;
             case SPEC_SCORE_STATE: processSpecScore(); break;
             case BACK_TO_INTAKE: processBackToIntake(); break;

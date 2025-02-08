@@ -59,10 +59,12 @@ public class HighBasketAuto extends OpMode {
 //    public static final Pose secondSpikePos = pointAndHeadingToPose(-58, -51.53, 93);
 //    public static final Pose thirdSpikePos = pointAndHeadingToPose(-59, -49.53, 110.5);
 
+
     public static final Pose basketScorePos = pointAndHeadingToPose(-53.0773, -57.212, 46.2469);
-    public static final Pose firstSpikePos = pointAndHeadingToPose(-49.5214, -47.336, 90); //This is the rightmost spike, and insert correct points
-    public static final Pose secondSpikePos = pointAndHeadingToPose(-57.8116, -42.1442, 93);
-    public static final Pose thirdSpikePos = pointAndHeadingToPose(-55.661, -38.4556, 110.5);
+    public static final Pose firstSpikePos = pointAndHeadingToPose(-49.5214, -51.336, 90); //This is the rightmost spike, and insert correct points
+    public static final Pose secondSpikePos = pointAndHeadingToPose(-57.1116, -51.542, 88);
+    public static final Pose thirdSpikePos = pointAndHeadingToPose(-55.661, -49.5326, 110.5);
+
 
 
     @Override
@@ -122,7 +124,8 @@ public class HighBasketAuto extends OpMode {
         return returnPoint;
     }
     public void processStartState() {
-        intakes.pivotSetPos(constants.intakePivotMidPos);
+//        intakes.pivotSetPos(constants.intakePivotGrabPos + 1); - IT NEEDS ALL THE POS VALUE
+        intakes.pivotSetPos(constants.intakePivotGrabPos);
         intakes.specSetPos(constants.specimenScorePos);
         makePath(basketScorePos);
         currentState = AUTO_STATE.PATH_ACTIVE;
@@ -130,11 +133,11 @@ public class HighBasketAuto extends OpMode {
     }
 
     int counter = 0;
-    int bonusCount = 23;
+//    int bonusCount = 23;
     public void processScoreState() {
         if (pivot.getPos() < constants.pivotUpPos - 10) {
             slides.setPow(1);
-            pivot.setPow(.7);
+            pivot.setPow(.75);
         }
         pivot.pivotSetPos(constants.pivotUpPos);
         if (pivot.getPos() > (constants.pivotUpPos - 50)) {
@@ -143,8 +146,8 @@ public class HighBasketAuto extends OpMode {
             if (slides.getLeftPos() > (constants.highBasketPos - 50)) {
                 intakes.pivotSetPos(constants.intakePivotScorePos);
                 if (counter < 22) {
-                    bonusCount--;
-                    if (bonusCount < 12) {
+//                    bonusCount--;
+                    if (counter > 12) {
                         intakes.setIntakePower(constants.intakeScorePow);
                     }
                     counter++;
@@ -158,18 +161,18 @@ public class HighBasketAuto extends OpMode {
     public void processResetMechanisms() {
         counter = 0;
         counter2 = 0;
-        bonusCount = 22;
+//        bonusCount = 22;
         if (pivot.getPos() > 30)
-            pivot.setPow(.35);
+            pivot.setPow(.3);
         intakes.setIntakePower(0);
-        intakes.pivotSetPos(constants.intakePivotMidPos);
-        slides.slideSetPos(0);
-        if (slides.getLeftPos() < 1900) {
-            pivot.pivotSetPos(-60);
-            intakes.spinSetPos(constants.intakeSpinDefault);
-            if (pivot.getPos() < 15) {
-                pivot.setPow(0);
-                pivot.resetPos();
+        intakes.pivotSetPos(constants.intakePivotMidPos - .15);
+//        slides.slideSetPos(0);
+//        if (slides.getLeftPos() < 1900) {
+//            pivot.pivotSetPos(-60);
+//            intakes.spinSetPos(constants.intakeSpinDefault);
+//            if (pivot.getPos() < 15) {
+//                pivot.setPow(0);
+//                pivot.resetPos();
                 if (samplesAcquired == 0 && !lastStatePickUp)
                     currentState = AUTO_STATE.GO_TO_FIRST_SPIKE;
                 else if (samplesAcquired == 1 && !lastStatePickUp)
@@ -180,8 +183,8 @@ public class HighBasketAuto extends OpMode {
                     lastStatePickUp = false;
                     currentState = AUTO_STATE.PATH_TO_BASKET_READY;
                 }
-            }
-        }
+//            }
+//        }
     }
 
     public void processFirstSpike() {
@@ -207,27 +210,42 @@ public class HighBasketAuto extends OpMode {
     int samplesAcquired = 0;
     boolean lastStatePickUp = false;
     public void processSpikePickUp() {
-        lastStatePickUp = true;
-        intakes.setIntakePower(constants.intakeCollectPow);
-        intakes.pivotSetPos(constants.intakePivotGrabPos);
-        if (Math.abs(slides.getPow() - 1) < .5)
-            slides.setPow(.9);
-        if (counter2 < 46) {
-            slides.slideSetPos(extendPosAuto);
-            counter2++;
-        } else {
-            samplesAcquired++;
-            currentState = AUTO_STATE.MECHANISMS_RESET;
+        slideCounter = 5;
+        if (pivot.getLeftPow() != 0) {
+            intakes.pivotSetPos(constants.intakePivotScorePos);
+            pivot.pivotSetPos(-60);
+            intakes.spinSetPos(constants.intakeSpinDefault);
+            if (pivot.getPos() < 15) {
+                pivot.setPow(0);
+                pivot.resetPos();
+            }
+        } else if (pivot.getLeftPow() == 0) {
+            lastStatePickUp = true;
+            intakes.setIntakePower(constants.intakeCollectPow);
+            intakes.pivotSetPos(constants.intakePivotGrabPos);
+            if (Math.abs(slides.getPow() - 1) < .5)
+                slides.setPow(.9);
+            if (counter2 < 46) {
+                slides.slideSetPos(extendPosAuto);
+                counter2++;
+            } else {
+                samplesAcquired++;
+                currentState = AUTO_STATE.MECHANISMS_RESET;
+            }
         }
     }
 
     public void processGoToBasket() {
-        makePath(new Pose(basketScorePos.getX() + 1, basketScorePos.getY() + 1, basketScorePos.getHeading()));
+        makePath(new Pose(basketScorePos.getX() + 1.7, basketScorePos.getY() + 1.7, basketScorePos.getHeading()));
         currentState = AUTO_STATE.PATH_ACTIVE;
         primerState = AUTO_STATE.SCORE_BASKET;
     }
 
+    int slideCounter = 7;
     public void processPathActive() {
+        slideCounter--;
+        if (slideCounter <= 0)
+            slides.slideSetPos(0);
         if (!pathIsBusy()) {
             currentState = primerState;
         }

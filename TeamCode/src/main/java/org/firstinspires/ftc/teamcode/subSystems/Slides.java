@@ -41,6 +41,9 @@ public class Slides {
         }
     }
 
+    public double getLeftPow() {return leftSlide.getPower();}
+    public double getRightPow() {return rightSlide.getPower();}
+
     public int getRightPos() {
         return rightSlide.getCurrentPosition();
     }
