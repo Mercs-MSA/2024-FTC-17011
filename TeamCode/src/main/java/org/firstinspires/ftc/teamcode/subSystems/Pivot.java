@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 public class Pivot {
 //    private DcMotorEx pivot; //V2
     private DcMotorEx rightPivot; //V3
@@ -31,7 +33,7 @@ public class Pivot {
         rightPivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightPivot.setTargetPositionTolerance(3);
         PIDFCoefficients pivotPIDFNew = new PIDFCoefficients(p, i, d, f);
-        rightPivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
+//        rightPivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
         rightPivot.setTargetPosition(0);
         rightPivot.setPower(.5);
         rightPivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -41,7 +43,7 @@ public class Pivot {
         leftPivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftPivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftPivot.setTargetPositionTolerance(3);
-        leftPivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
+//        leftPivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
         leftPivot.setTargetPosition(0);
         leftPivot.setPower(.5);
         leftPivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -61,6 +63,9 @@ public class Pivot {
     }
     public double getLeftPow() {return leftPivot.getPower();}
     public double getRightPow() {return rightPivot.getPower();}
+
+    public double getLeftCurrent() {return leftPivot.getCurrent(CurrentUnit.AMPS);}
+    public double getRightCurrent() {return rightPivot.getCurrent(CurrentUnit.AMPS);}
 
 
     public void resetPos() {
@@ -82,6 +87,7 @@ public class Pivot {
 
         leftPivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftPivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftPivot.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void encoderMode(double p, double i, double d, double f) {

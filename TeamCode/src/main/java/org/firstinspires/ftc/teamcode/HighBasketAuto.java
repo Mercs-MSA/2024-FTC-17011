@@ -61,9 +61,9 @@ public class HighBasketAuto extends OpMode {
 
 
     public static final Pose basketScorePos = pointAndHeadingToPose(-53.0773, -57.212, 46.2469);
-    public static final Pose firstSpikePos = pointAndHeadingToPose(-49.5214, -51.336, 90); //This is the rightmost spike, and insert correct points
-    public static final Pose secondSpikePos = pointAndHeadingToPose(-57.1116, -51.542, 88);
-    public static final Pose thirdSpikePos = pointAndHeadingToPose(-55.661, -49.5326, 110.5);
+    public static final Pose firstSpikePos = pointAndHeadingToPose(-49.1214, -51.336, 91); //This is the rightmost spike, and insert correct points
+    public static final Pose secondSpikePos = pointAndHeadingToPose(-56.1116, -51.542, 88);
+    public static final Pose thirdSpikePos = pointAndHeadingToPose(-54.661, -49.5326, 110.5);
 
 
 
@@ -123,9 +123,11 @@ public class HighBasketAuto extends OpMode {
         Point returnPoint = new Point(pose.getX(), pose.getY(), Point.CARTESIAN);
         return returnPoint;
     }
+
     public void processStartState() {
 //        intakes.pivotSetPos(constants.intakePivotGrabPos + 1); - IT NEEDS ALL THE POS VALUE
         intakes.pivotSetPos(constants.intakePivotGrabPos);
+//        intakes.pivotSetPow();
         intakes.specSetPos(constants.specimenScorePos);
         makePath(basketScorePos);
         currentState = AUTO_STATE.PATH_ACTIVE;
@@ -144,7 +146,7 @@ public class HighBasketAuto extends OpMode {
             pivot.setPow(0);
             slides.slideSetPos(constants.highBasketPos);
             if (slides.getLeftPos() > (constants.highBasketPos - 50)) {
-                intakes.pivotSetPos(constants.intakePivotScorePos);
+                intakes.pivotSetPos(constants.intakePivotScorePos - .2);
                 if (counter < 22) {
 //                    bonusCount--;
                     if (counter > 12) {
@@ -243,6 +245,7 @@ public class HighBasketAuto extends OpMode {
 
     int slideCounter = 7;
     public void processPathActive() {
+        intakes.pivotSetPos(constants.intakePivotGrabPos - .1);
         slideCounter--;
         if (slideCounter <= 0)
             slides.slideSetPos(0);

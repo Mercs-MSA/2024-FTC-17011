@@ -4,13 +4,15 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class Constants {
-    public final static double normalSpeed = 1;
-    public final static double slowSpeed = .45;
+    public final static double normalSpeed = .8;
+    public final static double slowSpeed = .4;
 
     //Mechanism Numbers!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public final static double intakePivotScorePos = 0.3; //V2 = 0
     public final static double intakePivotMidPos = .55; //V2 = .3
     public final static double intakePivotGrabPos = 0.98; //V1 = .55; V2 = .64
+    public final static double intakePivotUpPow = 0;
+    public final static double intakePivotDownPow = 0;
     public final static double intakeScorePos = .25;
     public final static double intakeHoldPos = 0;
     public final static double intakeScorePow = 1;
@@ -37,12 +39,12 @@ public class Constants {
     public static double pivotD = .4;
     public static double pivotF = .8;
 
-    public static int highBasketPos = 2200; //V1 - 2270
+    public static int highBasketPos = 2250; //V1 - 2270
     public static int climbPos = 1000; //V1 - 1210
     public static int extendPos = 1400;
     public static int extendPosAuto = 1400;
     public static int highSpecimenPos = 1320; //V1 - 1410
-    public static int highSpecScorePos = 920; //V1 - 1050
+    public static int highSpecScorePos = 910; //V1 - 1050
     public final static double lowBasketInch = 0;
 
     public final static double climbLowInch = 0;

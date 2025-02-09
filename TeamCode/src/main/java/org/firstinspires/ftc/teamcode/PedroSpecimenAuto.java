@@ -67,14 +67,14 @@ public class PedroSpecimenAuto extends OpMode {
     public static final Pose firstStaging = pointAndHeadingToPose(-11.25, 40, 90);
     public static final Pose secondStaging = pointAndHeadingToPose(-35.14,42.23,90);
     public static final Pose thirdStaging = pointAndHeadingToPose(-37,16.58,90);
-    public static final Pose firstPush = pointAndHeadingToPose(-55,16.58,90);
+    public static final Pose firstPush = pointAndHeadingToPose(-53,16.58,90);
     public static final Pose toObs = pointAndHeadingToPose(-50.5,53,90);
     public static final Pose secondPush = pointAndHeadingToPose(-65,17.33,90);
     public static final Pose backToObs = pointAndHeadingToPose(-64,59.52,90);
     public static final Pose toIntake = pointAndHeadingToPose(-35.33, 42, 270);
-    public static final Pose finalIntakePoint = pointAndHeadingToPose(-33.5,62.7,270);
+    public static final Pose finalIntakePoint = pointAndHeadingToPose(-33.5,63.25,270);
     
-    public static final Pose specScoreSecondPose = pointAndHeadingToPose(-3.25, 37.25, 89);
+    public static final Pose specScoreSecondPose = pointAndHeadingToPose(-3.25, 37.75, 89);
     public static final Pose specScoreThirdPose = pointAndHeadingToPose(-8.25, 37.55, 89);
 
     public static final Pose endPoint = pointAndHeadingToPose(-59,68,270);
@@ -327,9 +327,9 @@ public class PedroSpecimenAuto extends OpMode {
         if (specCount == 1)
             follower.setMaxPower(.5);
         Path segmentEight = new Path(new BezierCurve(poseToPoint(follower.getPose()), poseToPoint(toIntake)));
-        segmentEight.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(270), 1);
+        segmentEight.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(268), 1);
         Path segmentNine = new Path(new BezierCurve(poseToPoint(toIntake), poseToPoint(finalIntakePoint)));
-        segmentNine.setLinearHeadingInterpolation(Math.toRadians(268), Math.toRadians(268), 1);
+        segmentNine.setLinearHeadingInterpolation(Math.toRadians(268), Math.toRadians(270), 1);
         PathChain secondCurve = new PathChain(segmentEight, segmentNine);
         follower.followPath(secondCurve, true);
         currentState = AUTO_STATE.PATH_ACTIVE;
