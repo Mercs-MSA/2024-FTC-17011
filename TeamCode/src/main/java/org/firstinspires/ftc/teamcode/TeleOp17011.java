@@ -149,161 +149,181 @@ public class TeleOp17011 extends LinearOpMode {
 
         leftPivot.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-    public void scoringCode() {
-        //GP2 dpad up = high basket slides
-        //GP2 dpad down = everything down
-        //GP2 dpad left = specimen grab prep slides position
-        //GP2 dpad right = low basket/intake slides position
-        //GP2 left bumper = high specimen pos
-        //GP2 right bumper = high specimen score
-        //GP2 x = pivot up
-        //Lift High Basket
-        if (gamepad2.dpad_up) {
-            if (!pivotBool) {
-                slides.slideSetPos(highBasketPos);
-                intakes.pivotSetPos(intakePivotMidPos);
-            } else if (pivotBool) {
-                slides.slideSetPos(extendPos);
-            }
-        }
-//        if (gamepad2.dpad_left && pivotBool) {
-//            pivot.resetPos();
-//        }
 
-        //Lift High Specimen
-        if (gamepad2.left_bumper) {
-            if (!pivotBool) {
-                intakes.pivotSetPos(intakePivotGrabPos);
-                slides.slideSetPos(highSpecimenPos);
-            } else if (pivotBool) {
-                slides.slideSetPos(extendPos);
-            }
-        } else if (gamepad2.right_bumper) {
-            if (!pivotBool) {
-                intakes.specSetPos(specimenHoldPos);
-                slides.slideSetPos(highSpecScorePos);
-            } else if (pivotBool) {
-                slides.slideSetPos(extendPos);
-            }
-        }
+//    TODO: Button Mapping I want/Simpler Controls:
+//    Left Trigger - Intake Spin Left
+//    Right Trigger - Intake Spin Right
+//    Both Triggers - Intake Spin Backwards
+//    Right Bumper - Press once, makes Lift go up to High Specimen position, Press again, makes Lift go down slightly  to place specimen
+//    Left Bumper - Toggle sequence for sample pickup, on the first press of the button it makes sure the pivot is down, then makes sure the intake is up, then sends the lift out, then when the lift is fully out, the intake pivots down, Then when I see theres a sample in the intake, I press the button again, the Intake pivots up, Lift retracts
 
-        if (gamepad2.dpad_right && !climbTrue) {
-            slides.slideSetPos(climbPos);
-            intakes.pivotSetPos(intakePivotMidPos);
-            sleep(300);
-            climbTrue = true;
-        } else if (gamepad2.dpad_right && climbTrue){
-            slides.slideSetPos(0);
-            sleep(300);
-            climbTrue = false;
-        }
+//    Dpad UP - Brings the lift to the high basket position, makes sure that the intake is either pivoted in down or middle position, then when it sees the lift is in the highest position the intake pivots to the UP position
+//    Dpad Left - Level 2 Climb Sequence
+//    Dpad Right - Level 3 Climb Sequence
+//    Dpad Down - Reset button, brings the elevator down, pivot down, and makes sure the intake is in MIDDLE while the pivot goes down
+//    PS5 Triangle (Xbox Y) - Intake Pivot UP (Precautions if the sequences above dont work)
+//    PS5 Circle (Xbox B) - Intake Pivot MIDDLE (Precautions if the sequences above dont work)
+//    PS5 X (Xbox A) - Intake Pivot DOWN (Precautions if the sequences above dont work)
+//    PS5 Square (Xbox X) - Toggle Pivot Up
+//    Joystick Left - Fine tuning on Elevator
+//    Joystick Right - Nothing (Could be used for either manual intake or manual pivot control)
+//    Alternate Mode Using the Middle PS5 Button (reset mode for is auton sets the robot in a weird position):
+//    Joystick Left - Brings Lift down
+//    Joystick Right - Brings Pivot Down
+//    When I press the alternate mode button again it will reset all the encoder values and the robot should work normally
 
-        //Lift Down
-        if (gamepad2.dpad_down) {
-            slides.slideSetPos(0);
-        }
-//        } else if (gamepad2.cross) {
-//            pivotBool = true;
-//            pivot.pivotSetPos(pivotDownPos);
-//        }else if (gamepad2.triangle) { // Lift up
-//            pivotBool = false;
-//            pivot.pivotSetPos(pivotUpPos);
-//        }
+    public void gamepadTwo_Main() {
 
-        if (gamepad2.touchpad) {
-            if (encoderTrue) {
-                encoderTrue = false;
-                pivotBool = true;
-//                pivot.normalMode();
-                intakes.pivotSetPos(intakePivotMidPos);
-                sleep(200);
-            } else {
-                encoderTrue = true;
-//                pivot.encoderMode(pivotP, pivotI, pivotD, pivotF);
-                sleep(200);
-            }
-        }
-
-        if (gamepad2.right_stick_y > .1 && !encoderTrue) {
-            slides.slideSetPos(-1500);
-//            pivot.setPow(-1);
-        }
-
-
-//        if (Math.abs(gamepad2.left_stick_y) > .1) {
-//            slides.slideSetPos(slides.getLeftPos() + ((int) (-gamepad2.left_stick_y * 70)));
-            leftPivot.setPower(-gamepad2.left_stick_y);
-            rightPivot.setPower(-gamepad2.left_stick_y);
-
-        if (leftPivot.getPower() > 0)
-            pivotBool = false;
-
-        if (leftPivot.getPower() < 0) {
-            pivotBool = true;
-            leftPivot.setPower(leftPivot.getPower() * .5);
-            rightPivot.setPower(rightPivot.getPower() * .5);
-        }
-//            pivot.pivotSetPos(pivot.getPos() + (int)(operatorLeftStick * 20));
-//        }
-
-//        if (gamepad1.triangle && pivotBool) {
-//            pivotBool = false;
-//            pivot.pivotSetPos(pivotClimbPos);
-//        } else if (gamepad1.cross && !pivotBool) {
-//            pivot.pivotSetPos(pivotDownPos);
-//        }
     }
 
+    public void gamepadTwo_Extras() {
 
+    }
 
-    public void intakeCode() {
-        //GP1 right bumper = all open
-        //GP1 left bumper = all close
-        //GP2 right trigger = turn intake right
-        //GP2 left trigger = turn intake left
-        //GP2 y = intake pivot up
-        //GP2 a = intake pivot down
-        //GP2 b = intake pivot mid
-        if (gamepad1.right_bumper) {
-//            intakes.clawSetPos(intakeScorePos); V1
-            intakes.setIntakePower(intakeScorePow);
-            intakes.specSetPos(specimenScorePos);
-        } else if (gamepad1.left_bumper) {
-//            intakes.clawSetPos(intakeHoldPos); V1
-            intakes.setIntakePower(intakeCollectPow);
-            intakes.specSetPos(specimenHoldPos);
-        } else {
-            intakes.setIntakePower(0);
-        }
+    public void gamepadOne() {
 
-        if (gamepad2.right_trigger > .3 && gamepad2.left_trigger < .3) {
-            intakes.spinSetPos(intakeSpinRight);
-        } else if (gamepad2.left_trigger > .3 && gamepad2.right_trigger < .3) {
-            intakes.spinSetPos(intakeSpinLeft);
-        } else if (gamepad2.right_trigger > .3 && gamepad2.left_trigger > .3) {
-            intakes.spinSetPos(intakeSpinBack);
-        }else {
-            intakes.spinSetPos(intakeSpinDefault);
-        }
+    }
 
-        operatorRightStick = gamepad2.right_stick_y;
-        if (Math.abs(gamepad2.right_stick_y) > .1) {
-            intakes.pivotSetPos(intakes.pivotGetPos() + .1 * operatorRightStick);
-//            intakes.pivotSetPow(operatorRightStick);
-        }
-
-//        if (gamepad2.y) {
-//            intPivotControl = false;
-//            intakes.pivotSetPos(intakePivotScorePos);
+//    public void scoringCode() {
+//        if (gamepad2.dpad_up) {
+//            if (!pivotBool) {
+//                slides.slideSetPos(highBasketPos);
+//                intakes.pivotSetPos(intakePivotMidPos);
+//            } else if (pivotBool) {
+//                slides.slideSetPos(extendPos);
+//            }
 //        }
-//        } else if (gamepad2.a) {
-//            intPivotControl = true;
-//            intakes.pivotSetPos(intakePivotGrabPos);
-        if (gamepad2.circle) {
-            intPivotControl = false;
+////        if (gamepad2.dpad_left && pivotBool) {
+////            pivot.resetPos();
+////        }
+//
+//        //Lift High Specimen
+//        if (gamepad2.left_bumper) {
+//            if (!pivotBool) {
+//                intakes.pivotSetPos(intakePivotGrabPos);
+//                slides.slideSetPos(highSpecimenPos);
+//            } else if (pivotBool) {
+//                slides.slideSetPos(extendPos);
+//            }
+//        } else if (gamepad2.right_bumper) {
+//            if (!pivotBool) {
+//                intakes.specSetPos(specimenHoldPos);
+//                slides.slideSetPos(highSpecScorePos);
+//            } else if (pivotBool) {
+//                slides.slideSetPos(extendPos);
+//            }
+//        }
+//
+//        if (gamepad2.dpad_right && !climbTrue) {
+//            slides.slideSetPos(climbPos);
 //            intakes.pivotSetPos(intakePivotMidPos);
-        }
-    }
+//            sleep(300);
+//            climbTrue = true;
+//        } else if (gamepad2.dpad_right && climbTrue){
+//            slides.slideSetPos(0);
+//            sleep(300);
+//            climbTrue = false;
+//        }
+//
+//        //Lift Down
+//        if (gamepad2.dpad_down) {
+//            slides.slideSetPos(0);
+//        }
+////        } else if (gamepad2.cross) {
+////            pivotBool = true;
+////            pivot.pivotSetPos(pivotDownPos);
+////        }else if (gamepad2.triangle) { // Lift up
+////            pivotBool = false;
+////            pivot.pivotSetPos(pivotUpPos);
+////        }
+//
+//        if (gamepad2.touchpad) {
+//            if (encoderTrue) {
+//                encoderTrue = false;
+//                pivotBool = true;
+////                pivot.normalMode();
+//                intakes.pivotSetPos(intakePivotMidPos);
+//                sleep(200);
+//            } else {
+//                encoderTrue = true;
+////                pivot.encoderMode(pivotP, pivotI, pivotD, pivotF);
+//                sleep(200);
+//            }
+//        }
+//
+//        if (gamepad2.right_stick_y > .1 && !encoderTrue) {
+//            slides.slideSetPos(-1500);
+////            pivot.setPow(-1);
+//        }
+//
+//
+////        if (Math.abs(gamepad2.left_stick_y) > .1) {
+////            slides.slideSetPos(slides.getLeftPos() + ((int) (-gamepad2.left_stick_y * 70)));
+//            leftPivot.setPower(-gamepad2.left_stick_y);
+//            rightPivot.setPower(-gamepad2.left_stick_y);
+//
+//        if (leftPivot.getPower() > 0)
+//            pivotBool = false;
+//
+//        if (leftPivot.getPower() < 0) {
+//            pivotBool = true;
+//            leftPivot.setPower(leftPivot.getPower() * .5);
+//            rightPivot.setPower(rightPivot.getPower() * .5);
+//        }
+////            pivot.pivotSetPos(pivot.getPos() + (int)(operatorLeftStick * 20));
+////        }
+//
+////        if (gamepad1.triangle && pivotBool) {
+////            pivotBool = false;
+////            pivot.pivotSetPos(pivotClimbPos);
+////        } else if (gamepad1.cross && !pivotBool) {
+////            pivot.pivotSetPos(pivotDownPos);
+////        }
+//    }
+//
+//
+//
+//    public void intakeCode() {
+//        if (gamepad1.right_bumper) {
+////            intakes.clawSetPos(intakeScorePos); V1
+//            intakes.setIntakePower(intakeScorePow);
+//            intakes.specSetPos(specimenScorePos);
+//        } else if (gamepad1.left_bumper) {
+////            intakes.clawSetPos(intakeHoldPos); V1
+//            intakes.setIntakePower(intakeCollectPow);
+//            intakes.specSetPos(specimenHoldPos);
+//        } else {
+//            intakes.setIntakePower(0);
+//        }
+//
+//        if (gamepad2.right_trigger > .3 && gamepad2.left_trigger < .3) {
+//            intakes.spinSetPos(intakeSpinRight);
+//        } else if (gamepad2.left_trigger > .3 && gamepad2.right_trigger < .3) {
+//            intakes.spinSetPos(intakeSpinLeft);
+//        } else if (gamepad2.right_trigger > .3 && gamepad2.left_trigger > .3) {
+//            intakes.spinSetPos(intakeSpinBack);
+//        }else {
+//            intakes.spinSetPos(intakeSpinDefault);
+//        }
+//
+//        operatorRightStick = gamepad2.right_stick_y;
+//        if (Math.abs(gamepad2.right_stick_y) > .1) {
+//            intakes.pivotSetPos(intakes.pivotGetPos() + .1 * operatorRightStick);
+////            intakes.pivotSetPow(operatorRightStick);
+//        }
+//
+////        if (gamepad2.y) {
+////            intPivotControl = false;
+////            intakes.pivotSetPos(intakePivotScorePos);
+////        }
+////        } else if (gamepad2.a) {
+////            intPivotControl = true;
+////            intakes.pivotSetPos(intakePivotGrabPos);
+//        if (gamepad2.circle) {
+//            intPivotControl = false;
+////            intakes.pivotSetPos(intakePivotMidPos);
+//        }
+//    }
     private void fieldCentricDrive() {
         double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad1.left_stick_x;
@@ -395,8 +415,8 @@ public class TeleOp17011 extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            scoringCode();
-            intakeCode();
+            //scoringCode();
+            //intakeCode();
 //            fieldCentricDrive();
             mechanumDrive();
 
