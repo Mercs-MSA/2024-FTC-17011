@@ -26,7 +26,8 @@ public class Constants {
     public final static double specimenScorePos = 0.45; //V1 - .45 //V2 - .12
     public final static double specimenHoldPos = 0.63; //V1 - //V2 - .3
 
-
+    public static double climberClimbedPos = 0;
+    public static double climberReadyPos = 0;
 
 
 
@@ -34,20 +35,21 @@ public class Constants {
 
     public static int pivotUpPos = 250; //V1 - 420, V2 - 960
     public static int pivotDownPos = 20; //V1 - 60, V2 - 60
+    public static int pivotClimbPos = 0;
     public static double pivotP = 28;
     public static double pivotI = 1.1;
     public static double pivotD = .4;
     public static double pivotF = .8;
 
     public static int highBasketPos = 2250; //V1 - 2270
-    public static int climbPos = 1000; //V1 - 1210
+    public static int slideClimbPos = 1000; //V1 - 1210
+    public static int slideClimbDownPos = 0;
     public static int extendPos = 1400;
     public static int extendPosAuto = 1400;
     public static int highSpecimenPos = 1320; //V1 - 1410
     public static int highSpecScorePos = 910; //V1 - 1050
-    public final static double lowBasketInch = 0;
 
-    public final static double climbLowInch = 0;
+
 
 
 

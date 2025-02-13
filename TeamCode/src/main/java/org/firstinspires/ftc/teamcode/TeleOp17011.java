@@ -29,18 +29,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.Constants.climbPos;
-import static org.firstinspires.ftc.teamcode.Constants.extendPos;
-import static org.firstinspires.ftc.teamcode.Constants.highBasketPos;
-import static org.firstinspires.ftc.teamcode.Constants.highSpecScorePos;
-import static org.firstinspires.ftc.teamcode.Constants.highSpecimenPos;
+import static org.firstinspires.ftc.teamcode.Constants.climberClimbedPos;
+import static org.firstinspires.ftc.teamcode.Constants.climberReadyPos;
+import static org.firstinspires.ftc.teamcode.Constants.pivotClimbPos;
+import static org.firstinspires.ftc.teamcode.Constants.slideClimbDownPos;
+import static org.firstinspires.ftc.teamcode.Constants.slideClimbPos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeCollectPow;
 //import static org.firstinspires.ftc.teamcode.Constants.intakeHoldPos;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.subSystems.Climber;
 import org.firstinspires.ftc.teamcode.subSystems.Intakes;
-import static org.firstinspires.ftc.teamcode.Constants.intakePivotGrabPos;
-import static org.firstinspires.ftc.teamcode.Constants.intakePivotMidPos;
-import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
 //import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeScorePow;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinBack;
@@ -49,7 +46,6 @@ import static org.firstinspires.ftc.teamcode.Constants.intakeSpinLeft;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinRight;
 import static org.firstinspires.ftc.teamcode.Constants.normalSpeed;
 import static org.firstinspires.ftc.teamcode.Constants.pivotD;
-import static org.firstinspires.ftc.teamcode.Constants.pivotDownPos;
 import static org.firstinspires.ftc.teamcode.Constants.pivotF;
 import static org.firstinspires.ftc.teamcode.Constants.pivotI;
 import static org.firstinspires.ftc.teamcode.Constants.pivotP;
@@ -67,14 +63,9 @@ import static org.firstinspires.ftc.teamcode.Constants.specimenScorePos;
 
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.acmerobotics.dashboard.FtcDashboard;
 
@@ -94,6 +85,7 @@ public class TeleOp17011 extends LinearOpMode {
     public Intakes intakes;
     public Slides slides;
     public Pivot pivot;
+    public Climber climber;
 
 //    public DcMotorEx leftPivot = null;
 //    public DcMotorEx rightPivot = null;
@@ -142,6 +134,9 @@ public class TeleOp17011 extends LinearOpMode {
         slides = new Slides(hardwareMap);
 
         pivot = new Pivot(hardwareMap, pivotP, pivotI, pivotD, pivotF);
+
+        climber = new Climber(hardwareMap);
+        climber.setClimbers(climberReadyPos);
     }
 
 //    TODO: Button Mapping I want/Simpler Controls:
@@ -172,7 +167,44 @@ public class TeleOp17011 extends LinearOpMode {
         //Nandan
 
         //Joshua
+        if (gamepad2.right_trigger > .3 && gamepad2.left_trigger < .3) {
+            intakes.spinSetPos(intakeSpinRight);
+        } else if (gamepad2.left_trigger > .3 && gamepad2.right_trigger < .3) {
+            intakes.spinSetPos(intakeSpinLeft);
+        } else if (gamepad2.right_trigger > .3 && gamepad2.left_trigger > .3) {
+            intakes.spinSetPos(intakeSpinBack);
+        }else {
+            intakes.spinSetPos(intakeSpinDefault);
+        }
 
+        // CLIMB STAGE 2
+        if (gamepad2.dpad_left && !climbTrue) {
+            pivot.pivotSetPos(pivotUpPos);
+            slides.slideSetPos(slideClimbPos);
+            climbTrue = true;
+        } else if (gamepad2.dpad_left && climbTrue) {
+            pivot.pivotSetPos(pivotClimbPos);
+            sleep(300);
+            slides.slideSetPos(slideClimbDownPos);
+        }
+
+        if (climbTrue && slides.getLeftPos() < slideClimbDownPos + 15) {
+            climber.setClimbers(climberClimbedPos);
+            sleep(300);
+            slides.slideSetPos(slideClimbPos + 100);
+            sleep(300);
+            pivot.pivotSetPos(pivotUpPos);
+        }
+
+        // CLIMB STAGE 3
+        if (gamepad2.dpad_right && climbTrue) {
+            slides.slideSetPos(slideClimbPos);
+        } else if (climbTrue && gamepad2.dpad_right && slides.getLeftPos() > slideClimbPos - 20) {
+            pivot.pivotSetPos(pivotClimbPos);
+            sleep(300);
+            climber.setClimbers(climberReadyPos);
+            slides.slideSetPos(slideClimbDownPos);
+        }
     }
 
     public void gamepadTwo_Extras() {
@@ -190,7 +222,17 @@ public class TeleOp17011 extends LinearOpMode {
         //Nandan
 
         //Joshua
-
+        if (gamepad1.right_bumper) {
+//            intakes.clawSetPos(intakeScorePos); V1
+            intakes.setIntakePower(intakeScorePow);
+            intakes.specSetPos(specimenScorePos);
+        } else if (gamepad1.left_bumper) {
+//            intakes.clawSetPos(intakeHoldPos); V1
+            intakes.setIntakePower(intakeCollectPow);
+            intakes.specSetPos(specimenHoldPos);
+        } else {
+            intakes.setIntakePower(0);
+        }
     }
 
 //    public void scoringCode() {
