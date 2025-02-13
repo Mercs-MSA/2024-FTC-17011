@@ -33,7 +33,7 @@ public class Pivot {
         rightPivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightPivot.setTargetPositionTolerance(3);
         PIDFCoefficients pivotPIDFNew = new PIDFCoefficients(p, i, d, f);
-//        rightPivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
+        rightPivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
         rightPivot.setTargetPosition(0);
         rightPivot.setPower(.5);
         rightPivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -43,7 +43,7 @@ public class Pivot {
         leftPivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftPivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftPivot.setTargetPositionTolerance(3);
-//        leftPivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
+        leftPivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
         leftPivot.setTargetPosition(0);
         leftPivot.setPower(.5);
         leftPivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);

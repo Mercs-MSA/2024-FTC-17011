@@ -93,10 +93,10 @@ public class TeleOp17011 extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     public Intakes intakes;
     public Slides slides;
-//    public Pivot pivot;
+    public Pivot pivot;
 
-    public DcMotorEx leftPivot = null;
-    public DcMotorEx rightPivot = null;
+//    public DcMotorEx leftPivot = null;
+//    public DcMotorEx rightPivot = null;
 
     public boolean pivotBool = true;
     public boolean initSlides = true;
@@ -141,13 +141,7 @@ public class TeleOp17011 extends LinearOpMode {
 
         slides = new Slides(hardwareMap);
 
-//        pivot = new Pivot(hardwareMap, pivotP, pivotI, pivotD, pivotF);
-//        pivot.normalMode();
-
-        leftPivot = hardwareMap.get(DcMotorEx.class, "leftPivot");
-        rightPivot = hardwareMap.get(DcMotorEx.class, "rightPivot");
-
-        leftPivot.setDirection(DcMotorSimple.Direction.REVERSE);
+        pivot = new Pivot(hardwareMap, pivotP, pivotI, pivotD, pivotF);
     }
 
 //    TODO: Button Mapping I want/Simpler Controls:
@@ -173,14 +167,29 @@ public class TeleOp17011 extends LinearOpMode {
 //    When I press the alternate mode button again it will reset all the encoder values and the robot should work normally
 
     public void gamepadTwo_Main() {
+        //Namish
+
+        //Nandan
+
+        //Joshua
 
     }
 
     public void gamepadTwo_Extras() {
+        //Namish
+
+        //Nandan
+
+        //Joshua
 
     }
 
     public void gamepadOne() {
+        //Namish
+
+        //Nandan
+
+        //Joshua
 
     }
 
@@ -462,10 +471,10 @@ public class TeleOp17011 extends LinearOpMode {
             } else {
                 telemetry.addLine("Pivot is up/going up");
             }
-            telemetry.addData("Left Pivot power: ", leftPivot.getPower());
-            telemetry.addData("Right Pivot power: ", rightPivot.getPower());
-            telemetry.addData("Left Pivot Current: ", leftPivot.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("Right Pivot Current: ", rightPivot.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("Left Pivot power: ", pivot.getLeftPow());
+            telemetry.addData("Right Pivot power: ", pivot.getRightPow());
+            telemetry.addData("Left Pivot Current: ", pivot.getLeftCurrent());
+            telemetry.addData("Right Pivot Current: ", pivot.getRightCurrent());
 //            telemetry.addData("Left Slide power: ", slides.getLeftPow());
 //            telemetry.addData("Left Slide power: ", slides.getRightPow());
 
