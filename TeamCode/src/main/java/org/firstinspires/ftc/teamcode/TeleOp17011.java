@@ -94,15 +94,22 @@ public class TeleOp17011 extends LinearOpMode {
     public Intakes intakes;
     public Slides slides;
     public Pivot pivot;
+    private enum SAMPLECYCLE_STATE {
+        PIVOT_DOWN,
+        INTAKE_PIVOT,
+        INTAKE_PIVOT_DOWN,
+        LIFT_RETRACT,
+    }
+    public SAMPLECYCLE_STATE currentState = SAMPLECYCLE_STATE.PIVOT_DOWN;
 
 //    public DcMotorEx leftPivot = null;
 //    public DcMotorEx rightPivot = null;
-
+    public boolean lift = true;
     public boolean pivotBool = true;
     public boolean initSlides = true;
 
     public boolean intPivotControl = true;
-
+    public boolean highSpec = true;
     public double speedMultiplier;
     private boolean climbTrue = false;
     private boolean encoderTrue = true;
@@ -167,7 +174,17 @@ public class TeleOp17011 extends LinearOpMode {
 //    When I press the alternate mode button again it will reset all the encoder values and the robot should work normally
 
     public void gamepadTwo_Main() {
-        //Namish
+        if (gamepad2.dpad_up && lift) {
+            slides.slideSetPos(highBasketPos);
+            intakes.pivotSetPos(intakePivotMidPos);
+            lift = false;
+        }
+        if (lift == false && slides.getLeftPos() > 2200) {
+            intakes.pivotSetPos(intakePivotScorePos);
+            lift = true;
+        }
+
+
 
         //Nandan
 
@@ -176,8 +193,32 @@ public class TeleOp17011 extends LinearOpMode {
     }
 
     public void gamepadTwo_Extras() {
-        //Namish
+        if (gamepad2.right_bumper && highSpec) {
+            slides.slideSetPos(highSpecimenPos);
+            highSpec = false;
+        }
+        else if(gamepad2.right_bumper && !highSpec) {
+            slides.slideSetPos(highSpecScorePos);
+            highSpec = true;
+        }
 
+        if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.PIVOT_DOWN) {
+            pivot.pivotSetPos(pivotDownPos);
+            intakes.pivotSetPos(intakePivotMidPos);
+            currentState = SAMPLECYCLE_STATE.INTAKE_PIVOT;
+        }
+        else if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.INTAKE_PIVOT) {
+            slides.slideSetPos(extendPos);
+            currentState = SAMPLECYCLE_STATE.INTAKE_PIVOT_DOWN;
+        }
+        else if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.INTAKE_PIVOT_DOWN && slides.getLeftPos() > extendPos - 20) {
+            intakes.pivotSetPos(intakePivotGrabPos);
+            currentState = SAMPLECYCLE_STATE.LIFT_RETRACT;
+        }
+        else if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.LIFT_RETRACT && slides.getLeftPos() > extendPos - 20) {
+            slides.slideSetPos(0);
+            currentState = SAMPLECYCLE_STATE.PIVOT_DOWN;
+        }
         //Nandan
 
         //Joshua
