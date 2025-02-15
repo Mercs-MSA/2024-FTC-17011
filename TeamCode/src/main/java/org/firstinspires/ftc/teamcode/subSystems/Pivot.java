@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subSystems;
 
-import static org.firstinspires.ftc.teamcode.Constants.pivotUpPos;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -35,7 +33,7 @@ public class Pivot {
         PIDFCoefficients pivotPIDFNew = new PIDFCoefficients(p, i, d, f);
         rightPivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
         rightPivot.setTargetPosition(0);
-        rightPivot.setPower(.5);
+        rightPivot.setPower(0);
         rightPivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         leftPivot = hardwareMap.get(DcMotorEx.class, "leftPivot");
@@ -45,7 +43,7 @@ public class Pivot {
         leftPivot.setTargetPositionTolerance(3);
         leftPivot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pivotPIDFNew);
         leftPivot.setTargetPosition(0);
-        leftPivot.setPower(.5);
+        leftPivot.setPower(0);
         leftPivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftPivot.setDirection(DcMotorSimple.Direction.REVERSE);
     }
@@ -58,9 +56,21 @@ public class Pivot {
         rightPivot.setPower(pow);
         leftPivot.setPower(pow);
     }
-    public int getPos() {
+    public int getLeftPos() {
         return leftPivot.getCurrentPosition();
     }
+    public int getRightPos() {
+        return rightPivot.getCurrentPosition();
+    }
+
+    public void setMotorsOff() {
+        rightPivot.setMotorDisable();
+    }
+
+    public void setMotorsOn() {
+        rightPivot.setMotorEnable();
+    }
+
     public double getLeftPow() {return leftPivot.getPower();}
     public double getRightPow() {return rightPivot.getPower();}
 

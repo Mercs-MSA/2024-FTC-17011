@@ -71,14 +71,9 @@ import static org.firstinspires.ftc.teamcode.Constants.specimenScorePos;
 
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.acmerobotics.dashboard.FtcDashboard;
 
@@ -188,14 +183,55 @@ public class TeleOp17011 extends LinearOpMode {
             intakes.pivotSetPos(intakePivotMidPos);
             lift = false;
         }
-        if (lift == false && slides.getLeftPos() > 2200) {
+
+        if (!lift && slides.getLeftPos() > 2200) {
             intakes.pivotSetPos(intakePivotScorePos);
             lift = true;
         }
 
-
-
         //Nandan
+        if (gamepad2.dpad_down) { // DEF PROBLEM WITH THE PIVOTBOOL
+            slides.slideSetPos(0);
+            pivotBool = true;
+            pivot.pivotSetPos(pivotDownPos);
+            intakes.pivotSetPos(intakePivotMidPos);
+        } else if (Math.abs(gamepad2.left_stick_y) > .1) { // Lift up (needs joystick left fine tuning)
+            slides.slideSetPos(slides.getLeftPos() + (int) (-gamepad2.left_stick_y * 25));
+        }
+
+        if (gamepad2.y) { // UP POS
+            intPivotControl = false;
+            intakes.pivotSetPos(intakePivotScorePos);
+        }
+        else if (gamepad2.a) { // DOWN POS
+            intPivotControl = true;
+            intakes.pivotSetPos(intakePivotGrabPos);
+        }
+        if (gamepad2.circle) { // MID POS
+            intPivotControl = false;
+            intakes.pivotSetPos(intakePivotMidPos);
+        }
+        if (gamepad2.square) { // PIVOT UP
+            pivotBool = false;
+            pivot.pivotSetPos(pivotUpPos);
+        }
+        if (gamepad2.touchpad) { // RESET POS FOR AUTO
+            if (encoderTrue) {
+                encoderTrue = false;
+                pivotBool = true;
+                pivot.normalMode();
+                intakes.pivotSetPos(intakePivotMidPos);
+                sleep(200);
+            } else {
+                encoderTrue = true;
+                pivot.encoderMode(pivotP, pivotI, pivotD, pivotF);
+                sleep(200);
+            }
+        }
+        if (gamepad2.right_stick_y > .1 && !encoderTrue)
+            pivot.setPow(-1);
+        if (gamepad2.left_stick_y > .1  && !encoderTrue)
+            slides.slideSetPos(-1500);
 
         //Joshua
         if (gamepad2.right_trigger > .3 && gamepad2.left_trigger < .3) {
@@ -239,31 +275,39 @@ public class TeleOp17011 extends LinearOpMode {
     }
 
     public void gamepadTwo_Extras() {
-        if (gamepad2.right_bumper && highSpec) {
+        if (gamepad2.right_bumper && highSpec && slides.getLeftPos() < highSpecScorePos + 20) {
             slides.slideSetPos(highSpecimenPos);
             highSpec = false;
-        }
-        else if(gamepad2.right_bumper && !highSpec) {
+        } else if(gamepad2.right_bumper && !highSpec && slides.getLeftPos() > highSpecScorePos) {
             slides.slideSetPos(highSpecScorePos);
             highSpec = true;
         }
 
-        if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.PIVOT_DOWN) {
-            pivot.pivotSetPos(pivotDownPos);
+        if (gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.PIVOT_DOWN) {
+            if (!pivotBool) {
+                pivot.pivotSetPos(pivotDownPos);
+                pivotBool = true;
+            }
             intakes.pivotSetPos(intakePivotMidPos);
             currentState = SAMPLECYCLE_STATE.INTAKE_PIVOT;
-        }
-        else if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.INTAKE_PIVOT) {
+        } else if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.INTAKE_PIVOT) {
             slides.slideSetPos(extendPos);
-            currentState = SAMPLECYCLE_STATE.INTAKE_PIVOT_DOWN;
-        }
-        else if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.INTAKE_PIVOT_DOWN && slides.getLeftPos() > extendPos - 20) {
+//            currentState = SAMPLECYCLE_STATE.INTAKE_PIVOT_DOWN;
+//        } else if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.INTAKE_PIVOT_DOWN && slides.getLeftPos() > extendPos - 40) {
+            sleep(400);
             intakes.pivotSetPos(intakePivotGrabPos);
             currentState = SAMPLECYCLE_STATE.LIFT_RETRACT;
-        }
-        else if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.LIFT_RETRACT && slides.getLeftPos() > extendPos - 20) {
+        } else if(gamepad2.left_bumper && currentState == SAMPLECYCLE_STATE.LIFT_RETRACT && slides.getLeftPos() > extendPos - 20) {
+            intakes.pivotSetPos(intakePivotMidPos);
             slides.slideSetPos(0);
+            sleep(200);
             currentState = SAMPLECYCLE_STATE.PIVOT_DOWN;
+        }
+
+        if (slides.getLeftPos() < 20 && pivot.getLeftPos() > 20) {
+            currentState = SAMPLECYCLE_STATE.PIVOT_DOWN;
+        } else if (slides.getLeftPos() < 20 && pivot.getLeftPos() < 20) {
+            currentState = SAMPLECYCLE_STATE.INTAKE_PIVOT;
         }
         //Nandan
 
@@ -290,146 +334,6 @@ public class TeleOp17011 extends LinearOpMode {
         }
     }
 
-//    public void scoringCode() {
-//        if (gamepad2.dpad_up) {
-//            if (!pivotBool) {
-//                slides.slideSetPos(highBasketPos);
-//                intakes.pivotSetPos(intakePivotMidPos);
-//            } else if (pivotBool) {
-//                slides.slideSetPos(extendPos);
-//            }
-//        }
-////        if (gamepad2.dpad_left && pivotBool) {
-////            pivot.resetPos();
-////        }
-//
-//        //Lift High Specimen
-//        if (gamepad2.left_bumper) {
-//            if (!pivotBool) {
-//                intakes.pivotSetPos(intakePivotGrabPos);
-//                slides.slideSetPos(highSpecimenPos);
-//            } else if (pivotBool) {
-//                slides.slideSetPos(extendPos);
-//            }
-//        } else if (gamepad2.right_bumper) {
-//            if (!pivotBool) {
-//                intakes.specSetPos(specimenHoldPos);
-//                slides.slideSetPos(highSpecScorePos);
-//            } else if (pivotBool) {
-//                slides.slideSetPos(extendPos);
-//            }
-//        }
-//
-//        if (gamepad2.dpad_right && !climbTrue) {
-//            slides.slideSetPos(climbPos);
-//            intakes.pivotSetPos(intakePivotMidPos);
-//            sleep(300);
-//            climbTrue = true;
-//        } else if (gamepad2.dpad_right && climbTrue){
-//            slides.slideSetPos(0);
-//            sleep(300);
-//            climbTrue = false;
-//        }
-//
-//        //Lift Down
-//        if (gamepad2.dpad_down) {
-//            slides.slideSetPos(0);
-//        }
-////        } else if (gamepad2.cross) {
-////            pivotBool = true;
-////            pivot.pivotSetPos(pivotDownPos);
-////        }else if (gamepad2.triangle) { // Lift up
-////            pivotBool = false;
-////            pivot.pivotSetPos(pivotUpPos);
-////        }
-//
-//        if (gamepad2.touchpad) {
-//            if (encoderTrue) {
-//                encoderTrue = false;
-//                pivotBool = true;
-////                pivot.normalMode();
-//                intakes.pivotSetPos(intakePivotMidPos);
-//                sleep(200);
-//            } else {
-//                encoderTrue = true;
-////                pivot.encoderMode(pivotP, pivotI, pivotD, pivotF);
-//                sleep(200);
-//            }
-//        }
-//
-//        if (gamepad2.right_stick_y > .1 && !encoderTrue) {
-//            slides.slideSetPos(-1500);
-////            pivot.setPow(-1);
-//        }
-//
-//
-////        if (Math.abs(gamepad2.left_stick_y) > .1) {
-////            slides.slideSetPos(slides.getLeftPos() + ((int) (-gamepad2.left_stick_y * 70)));
-//            leftPivot.setPower(-gamepad2.left_stick_y);
-//            rightPivot.setPower(-gamepad2.left_stick_y);
-//
-//        if (leftPivot.getPower() > 0)
-//            pivotBool = false;
-//
-//        if (leftPivot.getPower() < 0) {
-//            pivotBool = true;
-//            leftPivot.setPower(leftPivot.getPower() * .5);
-//            rightPivot.setPower(rightPivot.getPower() * .5);
-//        }
-////            pivot.pivotSetPos(pivot.getPos() + (int)(operatorLeftStick * 20));
-////        }
-//
-////        if (gamepad1.triangle && pivotBool) {
-////            pivotBool = false;
-////            pivot.pivotSetPos(pivotClimbPos);
-////        } else if (gamepad1.cross && !pivotBool) {
-////            pivot.pivotSetPos(pivotDownPos);
-////        }
-//    }
-//
-//
-//
-//    public void intakeCode() {
-//        if (gamepad1.right_bumper) {
-////            intakes.clawSetPos(intakeScorePos); V1
-//            intakes.setIntakePower(intakeScorePow);
-//            intakes.specSetPos(specimenScorePos);
-//        } else if (gamepad1.left_bumper) {
-////            intakes.clawSetPos(intakeHoldPos); V1
-//            intakes.setIntakePower(intakeCollectPow);
-//            intakes.specSetPos(specimenHoldPos);
-//        } else {
-//            intakes.setIntakePower(0);
-//        }
-//
-//        if (gamepad2.right_trigger > .3 && gamepad2.left_trigger < .3) {
-//            intakes.spinSetPos(intakeSpinRight);
-//        } else if (gamepad2.left_trigger > .3 && gamepad2.right_trigger < .3) {
-//            intakes.spinSetPos(intakeSpinLeft);
-//        } else if (gamepad2.right_trigger > .3 && gamepad2.left_trigger > .3) {
-//            intakes.spinSetPos(intakeSpinBack);
-//        }else {
-//            intakes.spinSetPos(intakeSpinDefault);
-//        }
-//
-//        operatorRightStick = gamepad2.right_stick_y;
-//        if (Math.abs(gamepad2.right_stick_y) > .1) {
-//            intakes.pivotSetPos(intakes.pivotGetPos() + .1 * operatorRightStick);
-////            intakes.pivotSetPow(operatorRightStick);
-//        }
-//
-////        if (gamepad2.y) {
-////            intPivotControl = false;
-////            intakes.pivotSetPos(intakePivotScorePos);
-////        }
-////        } else if (gamepad2.a) {
-////            intPivotControl = true;
-////            intakes.pivotSetPos(intakePivotGrabPos);
-//        if (gamepad2.circle) {
-//            intPivotControl = false;
-////            intakes.pivotSetPos(intakePivotMidPos);
-//        }
-//    }
     private void fieldCentricDrive() {
         double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad1.left_stick_x;
@@ -524,24 +428,32 @@ public class TeleOp17011 extends LinearOpMode {
             //scoringCode();
             //intakeCode();
 //            fieldCentricDrive();
+            gamepadTwo_Main();
+            gamepadTwo_Extras();
+            gamepadOne();
             mechanumDrive();
 
-//            if (encoderTrue) {
-//                if (pivot.getPos() <= (20) && pivotBool && !gamepad2.touchpad) {
-//                    pivot.setPow(0);
-//                } else if (!pivotBool) {
-//                    pivot.setPow(.8);
-//                    if (pivot.getPos() > 240) {
-//                        pivot.setPow(0);
-//                    }
-//                } else if (pivot.getPos() > 20 && pivotBool) {
-//                    pivot.setPow(.3);
-//                }
-//
-//                if (pivotBool && slides.getLeftPos() > extendPos && pivot.getPos() < pivotDownPos) {
-//                    slides.slideSetPos(extendPos);
-//                }
-//            }
+            if (encoderTrue) {
+                if (pivot.getLeftPos() <= (20) && pivotBool && !gamepad2.touchpad) {
+                    pivot.setPow(0);
+                    pivot.setMotorsOff();
+                } else if (!pivotBool) {
+                    pivot.setPow(.8);
+                    pivot.setMotorsOn();
+                    if (pivot.getLeftPos() > pivotUpPos - 10) {
+                        pivot.setPow(0);
+                        pivot.setMotorsOff();
+                    }
+                } else if (pivot.getLeftPos() > 20 && pivotBool) {
+                    pivot.setPow(.5);
+                    pivot.setMotorsOn();
+                    intakes.pivotSetPos(intakePivotScorePos);
+                }
+
+                if (pivotBool && slides.getLeftPos() > extendPos && pivot.getLeftPos() < pivotDownPos) {
+                    slides.slideSetPos(extendPos);
+                }
+            }
 
 //            if (intPivotControl) {
 //                intakes.pivotSetPos(intakePivotGrabPos);
@@ -560,7 +472,6 @@ public class TeleOp17011 extends LinearOpMode {
                 speedMultiplier = normalSpeed;
             }
 
-//            telemetry.addData("Pivot: ", pivot.getPos());
             telemetry.addData("left slide: ", slides.getLeftPos());
             telemetry.addData("right slide: ", slides.getRightPos());
             if (pivotBool) {
@@ -568,19 +479,15 @@ public class TeleOp17011 extends LinearOpMode {
             } else {
                 telemetry.addLine("Pivot is up/going up");
             }
+            telemetry.addData("Pivot left pos: ", pivot.getLeftPos());
+            telemetry.addData("Pivot right pos: ", pivot.getRightPos());
             telemetry.addData("Left Pivot power: ", pivot.getLeftPow());
             telemetry.addData("Right Pivot power: ", pivot.getRightPow());
             telemetry.addData("Left Pivot Current: ", pivot.getLeftCurrent());
             telemetry.addData("Right Pivot Current: ", pivot.getRightCurrent());
+            telemetry.addData("Collection Enum: ", currentState);
 //            telemetry.addData("Left Slide power: ", slides.getLeftPow());
 //            telemetry.addData("Left Slide power: ", slides.getRightPow());
-
-
-
-            //            telemetry.addData("Current velocity:", rightBackDrive.getVelocity());
-//            telemetry.addData("Current power:", (rightBackDrive.getPower()*2500));
-//            telemetry.addData("PID Values:", pidNew);
-//            telemetry.addData("Old pidOrig:", pidOrig2);
             telemetry.update();
         }
     }

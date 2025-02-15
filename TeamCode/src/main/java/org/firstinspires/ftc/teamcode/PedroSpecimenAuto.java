@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.startingPoseLeft;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.startingPoseRight;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -211,7 +210,7 @@ public class PedroSpecimenAuto extends OpMode {
 
     private void processStaging() {
         pivot.pivotSetPos(constants.pivotUpPos);
-        if (Math.abs(pivot.getPos() - Constants.pivotUpPos) < 65) {
+        if (Math.abs(pivot.getLeftPos() - Constants.pivotUpPos) < 65) {
             slides.slideSetPos(Constants.highSpecimenPos);
             if (Math.abs(slides.getLeftPos() - Constants.highSpecimenPos) < 50) {
                 makePath(specScorePose);
@@ -377,7 +376,7 @@ public class PedroSpecimenAuto extends OpMode {
 
         telemetry.addData("pushing integer: ", pushingCount);
         telemetry.addData("follower busy?: ", follower.isBusy());
-        telemetry.addData("pivot pos: ", pivot.getPos());
+        telemetry.addData("pivot pos: ", pivot.getLeftPos());
         telemetry.addData("current state: ", currentState);
         telemetry.addData("left pos: ", Math.abs(slides.getLeftPos()));
         follower.telemetryDebug(telemetryA);

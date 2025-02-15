@@ -368,7 +368,7 @@ public class FourSpecAuto extends OpMode {
         }
 
         telemetry.addData("follower busy?: ", follower.isBusy());
-        telemetry.addData("pivot pos: ", pivot.getPos());
+        telemetry.addData("pivot pos: ", pivot.getLeftPos());
         telemetry.addData("current state: ", currentState);
         telemetry.addData("left pos: ", Math.abs(slides.getLeftPos()));
         follower.telemetryDebug(telemetryA);
