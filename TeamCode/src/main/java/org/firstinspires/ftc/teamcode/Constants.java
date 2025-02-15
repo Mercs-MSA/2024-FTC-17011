@@ -36,8 +36,8 @@ public class Constants {
     public static int pivotUpPos = 680; //V1 - 420, V2 - 960 RPM: 312 motors have 250
     public static int pivotDownPos = 20; //V1 - 60, V2 - 60
     public static int pivotClimbPos = 0;
-    public static double pivotP = 14; //28
-    public static double pivotI = .2; //1.1
+    public static double pivotP = 16; //28
+    public static double pivotI = 1.1;
     public static double pivotD = 0; //.4
     public static double pivotF = 0; //.8
 

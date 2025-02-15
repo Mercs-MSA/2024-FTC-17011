@@ -100,7 +100,7 @@ public class PedroSpecimenAuto extends OpMode {
     }
 
     public void initializeSubSystems() throws InterruptedException {
-        intakes = new Intakes(hardwareMap);
+        intakes = new Intakes(hardwareMap, telemetry);
         pivot = new Pivot(hardwareMap, constants.pivotP, constants.pivotI, constants.pivotD, constants.pivotF);
         slides = new Slides(hardwareMap);
     }

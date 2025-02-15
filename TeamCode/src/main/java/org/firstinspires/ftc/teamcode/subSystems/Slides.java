@@ -14,6 +14,7 @@ public class Slides {
         leftSlide.setDirection(DcMotor.Direction.REVERSE);
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftSlide.setTargetPosition(0);
         leftSlide.setPower(1);
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -23,6 +24,7 @@ public class Slides {
         rightSlide.setDirection(DcMotor.Direction.FORWARD);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightSlide.setTargetPosition(0);
         rightSlide.setPower(1);
         rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);

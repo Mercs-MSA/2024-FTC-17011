@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subSystems;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotScorePos;
 //import static org.firstinspires.ftc.teamcode.Constants.intakeScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeSpinDefault;
@@ -10,6 +11,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class Intakes {
     private CRServo intakeRight;
     private CRServo intakeLeft;
@@ -17,7 +20,9 @@ public class Intakes {
     private Servo intakePivot;
     private Servo specimenIntake;
 
-    public Intakes(HardwareMap hardwareMap) throws InterruptedException {
+    private Telemetry telemetry;
+
+    public Intakes(HardwareMap hardwareMap, Telemetry telemetry) throws InterruptedException {
         intakeRight = hardwareMap.get(CRServo.class, "intakeRightWheel");
 
         intakeLeft = hardwareMap.get(CRServo.class, "intakeLeftWheel");
@@ -30,6 +35,7 @@ public class Intakes {
 
         intakeLeft.setDirection(CRServo.Direction.REVERSE);
 
+        this.telemetry = telemetry;
 
 
         intakeRight.setPower(0);
@@ -51,6 +57,7 @@ public class Intakes {
     }
 
     public void pivotSetPos(double pos) {
+        telemetry.addData("Intake Pivot Pos: ", pos);
         intakePivot.setPosition(pos);
     }
 

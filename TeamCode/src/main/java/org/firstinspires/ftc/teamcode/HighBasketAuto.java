@@ -89,7 +89,7 @@ public class HighBasketAuto extends OpMode {
     }
 
     public void initializeSubSystems() throws InterruptedException {
-        intakes = new Intakes(hardwareMap);
+        intakes = new Intakes(hardwareMap, telemetry);
         pivot = new Pivot(hardwareMap, constants.pivotP, constants.pivotI, constants.pivotD, constants.pivotF);
         slides = new Slides(hardwareMap);
     }
@@ -137,7 +137,10 @@ public class HighBasketAuto extends OpMode {
     int counter = 0;
 //    int bonusCount = 23;
     public void processScoreState() {
-        if (pivot.getLeftPos() < constants.pivotUpPos - 10) {
+        slideCounter = 14;
+        if (pivot.getLeftPos() < (constants.pivotUpPos - 20)) {
+            if (slides.getLeftPos() < (constants.highBasketPos - 200))
+                intakes.pivotSetPos(constants.intakePivotGrabPos);
             slides.setPow(1);
             pivot.setPow(.75);
         }
@@ -146,7 +149,7 @@ public class HighBasketAuto extends OpMode {
             pivot.setPow(0);
             slides.slideSetPos(constants.highBasketPos);
             if (slides.getLeftPos() > (constants.highBasketPos - 50)) {
-                intakes.pivotSetPos(constants.intakePivotScorePos - .2);
+                intakes.pivotSetPos(constants.intakePivotScorePos);
                 if (counter < 22) {
 //                    bonusCount--;
                     if (counter > 12) {
@@ -167,7 +170,7 @@ public class HighBasketAuto extends OpMode {
         if (pivot.getLeftPos() > 30)
             pivot.setPow(.3);
         intakes.setIntakePower(0);
-        intakes.pivotSetPos(constants.intakePivotMidPos);
+        intakes.pivotSetPos(constants.intakePivotGrabPos);
 //        slides.slideSetPos(0);
 //        if (slides.getLeftPos() < 1900) {
 //            pivot.pivotSetPos(-60);
@@ -212,10 +215,10 @@ public class HighBasketAuto extends OpMode {
     int samplesAcquired = 0;
     boolean lastStatePickUp = false;
     public void processSpikePickUp() {
-        slideCounter = 5;
+        slideCounter = 14;
         if (pivot.getLeftPow() != 0) {
             intakes.pivotSetPos(constants.intakePivotScorePos);
-            pivot.pivotSetPos(-60);
+            pivot.pivotSetPos(0);
             intakes.spinSetPos(constants.intakeSpinDefault);
             if (pivot.getLeftPos() < 15) {
                 pivot.setPow(0);
@@ -243,9 +246,9 @@ public class HighBasketAuto extends OpMode {
         primerState = AUTO_STATE.SCORE_BASKET;
     }
 
-    int slideCounter = 10;
+    int slideCounter = 14;
     public void processPathActive() {
-        intakes.pivotSetPos(constants.intakePivotScorePos);
+//        intakes.pivotSetPos(constants.intakePivotScorePos);
         slideCounter--;
         if (slideCounter <= 0)
             slides.slideSetPos(0);
@@ -275,6 +278,7 @@ public class HighBasketAuto extends OpMode {
         processStateMachine();
 
         follower.update();
+        telemetry.addData("intake pivot pos: ", intakes.pivotGetPos());
         telemetry.addData("counter: ", counter);
         telemetry.addData("samples acquired: ", samplesAcquired);
         telemetry.addData("pivot pos: ", pivot.getLeftPos());
