@@ -66,8 +66,8 @@ public class PedroSpecimenAuto extends OpMode {
     public static final Pose firstStaging = pointAndHeadingToPose(-11.25, 40, 90);
     public static final Pose secondStaging = pointAndHeadingToPose(-35.14,42.23,90);
     public static final Pose thirdStaging = pointAndHeadingToPose(-37,16.58,90);
-    public static final Pose firstPush = pointAndHeadingToPose(-53,16.58,90);
-    public static final Pose toObs = pointAndHeadingToPose(-50.5,53,90);
+    public static final Pose firstPush = pointAndHeadingToPose(-42,16.58,90);
+    public static final Pose toObs = pointAndHeadingToPose(-42.5,53,90);
     public static final Pose secondPush = pointAndHeadingToPose(-65,17.33,90);
     public static final Pose backToObs = pointAndHeadingToPose(-64,59.52,90);
     public static final Pose toIntake = pointAndHeadingToPose(-35.33, 42, 270);
@@ -89,6 +89,7 @@ public class PedroSpecimenAuto extends OpMode {
             throw new RuntimeException(e);
         }
         follower.setMaxPower(.8);
+        pivot.setPow(.8);
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 

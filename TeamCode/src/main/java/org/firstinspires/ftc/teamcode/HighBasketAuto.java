@@ -36,7 +36,8 @@ public class HighBasketAuto extends OpMode {
 
     private enum AUTO_STATE {
         START_STATE,
-        PATH_ACTIVE,
+        AWAY_PATH_ACTIVE,
+        BACK_PATH_ACTIVE,
         DO_NOTHING,
         PATH_TO_BASKET_READY,
         GO_TO_FIRST_SPIKE,
@@ -61,9 +62,9 @@ public class HighBasketAuto extends OpMode {
 
 
     public static final Pose basketScorePos = pointAndHeadingToPose(-53.0773, -57.212, 46.2469);
-    public static final Pose firstSpikePos = pointAndHeadingToPose(-49.1214, -51.336, 91); //This is the rightmost spike, and insert correct points
-    public static final Pose secondSpikePos = pointAndHeadingToPose(-56.1116, -51.542, 88);
-    public static final Pose thirdSpikePos = pointAndHeadingToPose(-54.661, -49.5326, 110.5);
+    public static final Pose firstSpikePos = pointAndHeadingToPose(-49.3214, -51.336, 91.5); //This is the rightmost spike, and insert correct points
+    public static final Pose secondSpikePos = pointAndHeadingToPose(-56.2116, -51.542, 88);
+    public static final Pose thirdSpikePos = pointAndHeadingToPose(-60.566, -49.0326, 98); // -54.761 //119.5
 
 
 
@@ -130,29 +131,31 @@ public class HighBasketAuto extends OpMode {
 //        intakes.pivotSetPow();
         intakes.specSetPos(constants.specimenScorePos);
         makePath(basketScorePos);
-        currentState = AUTO_STATE.PATH_ACTIVE;
+        currentState = AUTO_STATE.BACK_PATH_ACTIVE;
         primerState = AUTO_STATE.SCORE_BASKET;
     }
 
     int counter = 0;
 //    int bonusCount = 23;
     public void processScoreState() {
-        slideCounter = 14;
-        if (pivot.getLeftPos() < (constants.pivotUpPos - 20)) {
+        intakes.spinSetPos(constants.intakeSpinDefault);
+        slideCounter = 7;
+//        if (pivot.getLeftPos() < (constants.pivotUpPos - 20)) {
             if (slides.getLeftPos() < (constants.highBasketPos - 200))
                 intakes.pivotSetPos(constants.intakePivotGrabPos);
             slides.setPow(1);
-            pivot.setPow(.75);
-        }
+//            pivot.setPow(1);
+//        }
         pivot.pivotSetPos(constants.pivotUpPos);
-        if (pivot.getLeftPos() > (constants.pivotUpPos - 50)) {
-            pivot.setPow(0);
+        if (pivot.getLeftPos() > (constants.pivotUpPos - 100)) {
             slides.slideSetPos(constants.highBasketPos);
+            if (pivot.getLeftPos() > (constants.pivotUpPos - 50))
+                pivot.setPow(0);
             if (slides.getLeftPos() > (constants.highBasketPos - 50)) {
                 intakes.pivotSetPos(constants.intakePivotScorePos);
-                if (counter < 22) {
+                if (counter < 21) {
 //                    bonusCount--;
-                    if (counter > 12) {
+                    if (counter > 5) {
                         intakes.setIntakePower(constants.intakeScorePow);
                     }
                     counter++;
@@ -168,7 +171,7 @@ public class HighBasketAuto extends OpMode {
         counter2 = 0;
 //        bonusCount = 22;
         if (pivot.getLeftPos() > 30)
-            pivot.setPow(.3);
+            pivot.setPow(.5);
         intakes.setIntakePower(0);
         intakes.pivotSetPos(constants.intakePivotGrabPos);
 //        slides.slideSetPos(0);
@@ -193,21 +196,23 @@ public class HighBasketAuto extends OpMode {
     }
 
     public void processFirstSpike() {
+        followerConstants.pathEndTimeoutConstraint = 300;
         makePath(firstSpikePos);
-        currentState = AUTO_STATE.PATH_ACTIVE;
+        currentState = AUTO_STATE.AWAY_PATH_ACTIVE;
         primerState = AUTO_STATE.PICKUP_SPIKE;
     }
 
     public void processSecondSpike() {
+        followerConstants.pathEndTimeoutConstraint = 300;
         makePath(secondSpikePos);
-        currentState = AUTO_STATE.PATH_ACTIVE;
+        currentState = AUTO_STATE.AWAY_PATH_ACTIVE;
         primerState = AUTO_STATE.PICKUP_SPIKE;
     }
 
     public void processThirdSpike() {
-        intakes.pivotSetPos(constants.intakeSpinRight);
+        followerConstants.pathEndTimeoutConstraint = 400;
         makePath(thirdSpikePos);
-        currentState = AUTO_STATE.PATH_ACTIVE;
+        currentState = AUTO_STATE.AWAY_PATH_ACTIVE;
         primerState = AUTO_STATE.PICKUP_SPIKE;
     }
 
@@ -215,9 +220,14 @@ public class HighBasketAuto extends OpMode {
     int samplesAcquired = 0;
     boolean lastStatePickUp = false;
     public void processSpikePickUp() {
-        slideCounter = 14;
+        slideCounter = 7;
+        if ((counter2 > 20) && samplesAcquired == 2)
+            intakes.spinSetPos(constants.intakeSpinRight - .17);
         if (pivot.getLeftPow() != 0) {
-            intakes.pivotSetPos(constants.intakePivotScorePos);
+            if (pivot.getLeftPos() > 200)
+                intakes.pivotSetPos(constants.intakePivotScorePos);
+            else
+                intakes.pivotSetPos(constants.intakePivotGrabPos);
             pivot.pivotSetPos(0);
             intakes.spinSetPos(constants.intakeSpinDefault);
             if (pivot.getLeftPos() < 15) {
@@ -230,10 +240,14 @@ public class HighBasketAuto extends OpMode {
             intakes.pivotSetPos(constants.intakePivotGrabPos);
             if (Math.abs(slides.getPow() - 1) < .5)
                 slides.setPow(.9);
-            if (counter2 < 46) {
+            if ((counter2 < 46) && (samplesAcquired == 2)) {
+                slides.slideSetPos(extendPosAuto);
+                counter2++;
+            } else if ((counter2 < 38) && (samplesAcquired < 2)) {
                 slides.slideSetPos(extendPosAuto);
                 counter2++;
             } else {
+                intakes.pivotSetPos(constants.intakePivotMidPos);
                 samplesAcquired++;
                 currentState = AUTO_STATE.MECHANISMS_RESET;
             }
@@ -241,27 +255,49 @@ public class HighBasketAuto extends OpMode {
     }
 
     public void processGoToBasket() {
-        makePath(new Pose(basketScorePos.getX() + 1.7, basketScorePos.getY() + 1.7, basketScorePos.getHeading()));
-        currentState = AUTO_STATE.PATH_ACTIVE;
+        followerConstants.pathEndTimeoutConstraint = 350;
+        makePath(new Pose(basketScorePos.getX() + 1, basketScorePos.getY() + 3, basketScorePos.getHeading()));
+        currentState = AUTO_STATE.BACK_PATH_ACTIVE;
         primerState = AUTO_STATE.SCORE_BASKET;
     }
 
-    int slideCounter = 14;
-    public void processPathActive() {
+    int slideCounter = 7;
+    public void processAwayPathActive() {
 //        intakes.pivotSetPos(constants.intakePivotScorePos);
         slideCounter--;
-        if (slideCounter <= 0)
+        if (slideCounter <= 0) {
             slides.slideSetPos(0);
+            if (pivot.getLeftPos() > 200)
+                intakes.pivotSetPos(constants.intakePivotScorePos);
+            else
+                intakes.pivotSetPos(constants.intakePivotGrabPos);
+            pivot.pivotSetPos(0);
+        }
+        if (!pathIsBusy()) {
+            currentState = primerState;
+        }
+    }
+
+    public void processBackPathActive() {
+//        intakes.pivotSetPos(constants.intakePivotScorePos);
+//        slideCounter--;
+//        if (slideCounter <= 0)
+//            slides.slideSetPos(0);
+        slides.slideSetPos(0);
+        pivot.setPow(1);
+        pivot.pivotSetPos(constants.pivotUpPos);
         if (!pathIsBusy()) {
             currentState = primerState;
         }
     }
 
     public void processDoNothing() {}
+
     private void processStateMachine() {
         switch(currentState) {
             case START_STATE: processStartState(); break;
-            case PATH_ACTIVE: processPathActive(); break;
+            case AWAY_PATH_ACTIVE: processAwayPathActive(); break;
+            case BACK_PATH_ACTIVE: processBackPathActive(); break;
             case SCORE_BASKET: processScoreState(); break;
             case MECHANISMS_RESET: processResetMechanisms(); break;
             case PICKUP_SPIKE: processSpikePickUp(); break;
