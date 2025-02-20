@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstan
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.leftRearMotorName;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.rightFrontMotorName;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.rightRearMotorName;
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.startingPoseFourSpec;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.startingPoseLeft;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.startingPoseRight;
 
@@ -55,7 +56,7 @@ public class LocalizationTest extends OpMode {
     public void init() {
         poseUpdater = new PoseUpdater(hardwareMap);
 
-        poseUpdater.setStartingPose(startingPoseLeft);
+        poseUpdater.setStartingPose(startingPoseFourSpec);
 
         dashboardPoseTracker = new DashboardPoseTracker(poseUpdater);
 

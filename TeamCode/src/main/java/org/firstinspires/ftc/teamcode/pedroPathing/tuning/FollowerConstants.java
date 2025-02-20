@@ -26,7 +26,7 @@ public class FollowerConstants {
 
     public static Pose startingPoseRight = new Pose(-11.25, 63, Math.toRadians(90));
 
-    public static Pose startingPoseFourSpec = new Pose(21, 63.75, Math.toRadians(90));
+    public static Pose startingPoseFourSpec = new Pose(18.625, -63, Math.toRadians(90));
 
     // This section is for configuring your motors
     public static String leftFrontMotorName = "frontLeft";

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.startingPoseFourSpec;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.startingPoseRight;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -43,6 +44,7 @@ public class FourSpecAuto extends OpMode {
 //    private AUTO_DRIVE_STATE currentDriveState = AUTO_DRIVE_STATE.START_STATE;
     private enum AUTO_STATE {
         START_STATE,
+        COLLECTING_PATH_ACTIVE,
         PATH_ACTIVE,
         COLLECT_STATE,
         TURN_TO_DROP_OFF,
@@ -63,10 +65,10 @@ public class FourSpecAuto extends OpMode {
     private static ElapsedTime timeoutTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private int timeoutPeriod = 0;
     //------------------------------------------------------------------------------------------------------------------------
-    public static final Pose spikeOnePose = pointAndHeadingToPose(-11.25, 43.05, 90);
-    public static final Pose spikeOneTurnPose = pointAndHeadingToPose(-11.25, 43.05, 90);
-    public static final Pose spikeTwoPose = pointAndHeadingToPose(-9.75, 36.25, 90);
-    public static final Pose spikeTwoTurnPose = pointAndHeadingToPose(-11.25, 43.05, 90);
+    public static final Pose spikeOnePose = pointAndHeadingToPose(40.9134, -52.7514, 90); //-49.68
+    //public static final Pose spikeOneTurnPose = pointAndHeadingToPose(44.0363, -50.98, 325);
+    public static final Pose spikeTwoPose = pointAndHeadingToPose(53.1795, -54.073, 90);
+    public static final Pose spikeTwoTurnPose = pointAndHeadingToPose(44.0363, -50.98, 215);
 
     public static final Pose toIntake = pointAndHeadingToPose(-35.33, 42, 270);
     public static final Pose finalIntakePoint = pointAndHeadingToPose(-33.5,62.7,270);
@@ -81,7 +83,7 @@ public class FourSpecAuto extends OpMode {
     @Override
     public void init() {
         follower = new Follower(hardwareMap);
-        follower.setStartingPose(startingPoseRight);
+        follower.setStartingPose(startingPoseFourSpec);
         follower.update();
         try {
             initializeSubSystems();
@@ -191,10 +193,11 @@ public class FourSpecAuto extends OpMode {
 
     private void processStartState() {
         makePath(spikeOnePose);
-        intakes.pivotSetPos(Constants.intakePivotMidPos);
+        intakes.pivotSetPos(Constants.intakePivotMidPos + .35);
         intakes.specSetPos(Constants.specimenScorePos);
-        currentState = AUTO_STATE.PATH_ACTIVE;
-        primerState = AUTO_STATE.DO_NOTHING_STATE;
+        slides.slideSetPos(constants.extendPos - 800);
+        currentState = AUTO_STATE.COLLECTING_PATH_ACTIVE;
+        primerState = AUTO_STATE.COLLECT_STATE;
     }
 
     private void processPathActive() {
@@ -202,15 +205,22 @@ public class FourSpecAuto extends OpMode {
             currentState = primerState;
     }
 
+    private void processCollectionPathActive() {
+        if (!pathIsBusy())
+            currentState = primerState;
+
+    }
+
     int collected = 0;
     int collectCounter = 0;
     private void processCollect() {
+        intakes.spinSetPos(constants.intakeSpinDefault);
         intakes.pivotSetPos(constants.intakePivotGrabPos);
         intakes.setIntakePower(constants.intakeCollectPow);
-        if (collected == 0 && collectCounter < 45) {
+        if (collected == 0 && collectCounter < 35) {
             slides.slideSetPos(constants.extendPos);
             collectCounter++;
-        } else if (collected == 1 && collectCounter < 12) {
+        } else if (collected == 1 && collectCounter < 22) {
             slides.slideSetPos(constants.extendPos);
             collectCounter++;
         } else {
@@ -221,23 +231,24 @@ public class FourSpecAuto extends OpMode {
 
     private void processTurnToDropOff() {
         collectCounter = 0;
-        if (collected == 0) {
-            follower.holdPoint(spikeOneTurnPose);
-        } else {
-            follower.holdPoint(spikeTwoTurnPose);
-        }
-        currentState = AUTO_STATE.PATH_ACTIVE;
+        dropCounter = 0;
+        slides.slideSetPos(constants.extendPos - 900);
+        makePath(spikeTwoTurnPose);
+        currentState = AUTO_STATE.COLLECTING_PATH_ACTIVE;
         primerState = AUTO_STATE.DROP_OFF_STATE;
     }
 
     int dropCounter = 0;
     private void processDropOff() {
         if (dropCounter < 5) {
+            intakes.spinSetPos(constants.intakeSpinLeft);
             intakes.setIntakePower(constants.intakeScorePow);
+            dropCounter++;
         } else if (collected == 1) {
             currentState = AUTO_STATE.SPIKE_TWO_STATE;
         } else {
-            currentState = AUTO_STATE.PIVOT_UP;
+            //currentState = AUTO_STATE.PIVOT_UP;
+            currentState = AUTO_STATE.DO_NOTHING_STATE;
         }
     }
 
@@ -338,6 +349,7 @@ public class FourSpecAuto extends OpMode {
     private void processStateMachine() {
         switch(currentState) {
             case START_STATE: processStartState(); break;
+            case COLLECTING_PATH_ACTIVE: processCollectionPathActive(); break;
             case PATH_ACTIVE: processPathActive(); break;
             case COLLECT_STATE: processCollect(); break;
             case TURN_TO_DROP_OFF: processTurnToDropOff(); break;
