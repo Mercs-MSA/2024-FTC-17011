@@ -180,16 +180,19 @@ public class TeleOp17011 extends LinearOpMode {
 //    When I press the alternate mode button again it will reset all the encoder values and the robot should work normally
 
     public void gamepadTwo_Main() {
-        if (gamepad2.dpad_up && lift) {
+        if (gamepad2.dpad_up && !pivotBool) {
             slides.slideSetPos(highBasketPos);
             intakes.pivotSetPos(intakePivotMidPos);
-            lift = false;
+//            lift = false;
+        } else if (gamepad2.dpad_up && pivotBool) {
+            slides.slideSetPos(extendPos);
+//            intakes.pivotSetPos(intakePivotMidPos);
         }
 
-        if (!lift && (slides.getLeftPos() > 2200)) {
-            intakes.pivotSetPos(intakePivotScorePos);
-            lift = true;
-        }
+//        if (!lift && (slides.getLeftPos() > 2200)) {
+//            intakes.pivotSetPos(intakePivotScorePos);
+//            lift = true;
+//        }
 
         //Nandan
         if (gamepad2.dpad_down) { // DEF PROBLEM WITH THE PIVOTBOOL
@@ -248,36 +251,30 @@ public class TeleOp17011 extends LinearOpMode {
 
         // CLIMB STAGE 2
         if (gamepad2.dpad_left && !climbTrue) {
-            pivot.pivotSetPos(pivotUpPos);
-            slides.slideSetPos(slideClimbPos);
-            climbTrue = true;
-        } else if (gamepad2.dpad_left && climbTrue) {
-            pivot.pivotSetPos(pivotClimbPos);
-            sleep(300);
-            slides.slideSetPos(slideClimbDownPos);
+            slides.slideSetPos(0);
         }
 
-        if (climbTrue && slides.getLeftPos() < slideClimbDownPos + 15) {
-            climber.setClimbers(climberClimbedPos);
-            sleep(300);
-            slides.slideSetPos(slideClimbPos + 100);
-            sleep(300);
-            pivot.pivotSetPos(pivotUpPos);
-        }
+//        if (climbTrue && slides.getLeftPos() < slideClimbDownPos + 15) {
+//            climber.setClimbers(climberClimbedPos);
+//            sleep(300);
+//            slides.slideSetPos(slideClimbPos + 100);
+//            sleep(300);
+//            pivot.pivotSetPos(pivotUpPos);
+//        }
 
         // CLIMB STAGE 3
-        if (gamepad2.dpad_right && climbTrue) {
-            slides.slideSetPos(slideClimbPos);
-        } else if (climbTrue && gamepad2.dpad_right && slides.getLeftPos() > slideClimbPos - 20) {
-            pivot.pivotSetPos(pivotClimbPos);
-            sleep(300);
-            climber.setClimbers(climberReadyPos);
-            slides.slideSetPos(slideClimbDownPos);
-        }
+//        if (gamepad2.dpad_right && climbTrue) {
+//            slides.slideSetPos(slideClimbPos);
+//        } else if (climbTrue && gamepad2.dpad_right && slides.getLeftPos() > slideClimbPos - 20) {
+//            pivot.pivotSetPos(pivotClimbPos);
+//            sleep(300);
+//            climber.setClimbers(climberReadyPos);
+//            slides.slideSetPos(slideClimbDownPos);
+//        }
     }
 
     public void gamepadTwo_Extras() {
-        if (gamepad2.right_bumper && highSpec && slides.getLeftPos() < highSpecScorePos + 20) {
+        if (gamepad2.right_bumper && highSpec && slides.getLeftPos() < (highSpecScorePos + 20)) {
             slides.slideSetPos(highSpecimenPos);
             highSpec = false;
         } else if(gamepad2.right_bumper && !highSpec && slides.getLeftPos() > highSpecScorePos) {
@@ -448,7 +445,7 @@ public class TeleOp17011 extends LinearOpMode {
                         pivot.setPow(0);
                         pivot.setMotorsOff();
                     }
-                } else if ((pivot.getLeftPos() > 20) && pivotBool) {
+                } else if ((pivot.getLeftPos() > 30) && pivotBool) {
                     pivot.setPow(.5);
                     pivot.setMotorsOn();
                     intakes.pivotSetPos(intakePivotScorePos);
