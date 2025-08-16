@@ -40,7 +40,6 @@ import static org.firstinspires.ftc.teamcode.Constants.highBasketPos;
 import static org.firstinspires.ftc.teamcode.Constants.highSpecScorePos;
 import static org.firstinspires.ftc.teamcode.Constants.intakeCollectPow;
 //import static org.firstinspires.ftc.teamcode.Constants.intakeHoldPos;
-import org.firstinspires.ftc.teamcode.subSystems.Climber;
 import org.firstinspires.ftc.teamcode.subSystems.Intakes;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotGrabPos;
 import static org.firstinspires.ftc.teamcode.Constants.intakePivotMidPos;
@@ -93,7 +92,6 @@ public class TeleOp17011 extends LinearOpMode {
     public Intakes intakes;
     public Slides slides;
     public Pivot pivot;
-    public Climber climber;
 
     private enum SAMPLECYCLE_STATE {
         PIVOT_DOWN,
@@ -132,10 +130,10 @@ public class TeleOp17011 extends LinearOpMode {
     }
 
     public void initializeMotors() throws InterruptedException {
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "frontLeft");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "backLeft");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRight");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "backRight");
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "FL");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "BL");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "FR");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "BR");
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE //V2 - FORWARD
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD); //V1 - REVERSE //V2 - FORWARD
@@ -153,8 +151,6 @@ public class TeleOp17011 extends LinearOpMode {
 
         pivot = new Pivot(hardwareMap, pivotP, pivotI, pivotD, pivotF);
 
-        climber = new Climber(hardwareMap);
-        climber.setClimbers(climberReadyPos);
     }
 
 //    TODO: Button Mapping I want/Simpler Controls:
@@ -376,8 +372,8 @@ public class TeleOp17011 extends LinearOpMode {
 //            telemetry = dash.getTelemetry();
 
         // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-        double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-        double lateral =  gamepad1.left_stick_x;
+        double axial   = -gamepad1.left_stick_x;  // Note: pushing stick forward gives negative value
+        double lateral =  gamepad1.left_stick_y;
         double yaw     =  gamepad1.right_stick_x;
 
         // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -405,6 +401,8 @@ public class TeleOp17011 extends LinearOpMode {
         leftBackDrive.setPower(leftBackPower * speedMultiplier);
         rightBackDrive.setPower(rightBackPower * speedMultiplier);
     }
+
+
 
 
 

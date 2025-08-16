@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subSystems;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+/*
 public class Climber {
     private Servo leftClimb;
     private Servo rightClimb;
@@ -26,3 +27,4 @@ public class Climber {
         return rightClimb.getPosition();
     }
 }
+*/

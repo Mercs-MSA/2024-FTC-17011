@@ -25,7 +25,7 @@ public class Pivot {
 //        pivot.setPower(.85);
 //        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        rightPivot = hardwareMap.get(DcMotorEx.class, "rightPivot");
+        rightPivot = hardwareMap.get(DcMotorEx.class, "Right Pivot");
         rightPivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightPivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightPivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -36,7 +36,7 @@ public class Pivot {
         rightPivot.setPower(0);
         rightPivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        leftPivot = hardwareMap.get(DcMotorEx.class, "leftPivot");
+        leftPivot = hardwareMap.get(DcMotorEx.class, "Left Pivot");
         leftPivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftPivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftPivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

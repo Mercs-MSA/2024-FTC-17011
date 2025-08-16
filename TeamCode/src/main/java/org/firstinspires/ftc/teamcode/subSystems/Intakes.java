@@ -37,7 +37,6 @@ public class Intakes {
 
         this.telemetry = telemetry;
 
-
         intakeRight.setPower(0);
 
         intakeLeft.setPower(0);

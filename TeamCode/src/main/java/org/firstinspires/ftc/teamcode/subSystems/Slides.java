@@ -10,7 +10,8 @@ public class Slides {
     private DcMotorEx rightSlide;
 
     public Slides(HardwareMap hardwareMap) throws InterruptedException {
-        leftSlide = hardwareMap.get(DcMotorEx.class, "leftSlide");;
+
+        leftSlide = hardwareMap.get(DcMotorEx.class, "Left Lift");;
         leftSlide.setDirection(DcMotor.Direction.REVERSE);
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -19,7 +20,7 @@ public class Slides {
         leftSlide.setPower(1);
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        rightSlide = hardwareMap.get(DcMotorEx.class, "rightSlide");
+        rightSlide = hardwareMap.get(DcMotorEx.class, "Right Lift");
 //        rightSlide.setDirection(DcMotor.Direction.REVERSE); //V2
         rightSlide.setDirection(DcMotor.Direction.FORWARD);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
